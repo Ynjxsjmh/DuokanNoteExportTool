@@ -12,7 +12,7 @@ class Connector:
         cur = self.con.cursor()
 
         sql = '''
-        SELECT annotations.added_date AS added_date, annotation_type,
+        SELECT annotations.added_date AS added_date,
                annotation_range, annotation_body, annotation_sample
         FROM annotations
         INNER JOIN books on annotations.book_id = books._id
