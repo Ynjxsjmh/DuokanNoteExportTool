@@ -13,7 +13,8 @@ class Connector:
 
         sql = '''
         SELECT annotations.added_date AS added_date,
-               annotation_range, annotation_body, annotation_sample
+               annotation_range, annotation_body, annotation_sample,
+               package_type
         FROM annotations
         INNER JOIN books on annotations.book_id = books._id
         WHERE books._id = ?;
