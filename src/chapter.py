@@ -1,6 +1,8 @@
+import cchardet as chardet
 import epub
 import json
 from PyPDF2 import PdfFileReader
+import re
 
 
 class Chapter:
@@ -12,12 +14,44 @@ class Chapter:
 
 
 class TXTChapter(Chapter):
-    def __init__(self):
-        pass
+    def __init__(self, path):
+        self.encoding = None
 
-    def getChapterName(self, index):
-        pass
+        with open(path, "rb") as f:
+            content = f.read()
+            result = chardet.detect(content)
+            self.encoding = result['encoding']
 
+        self.chapters = []
+
+        with open(path, 'r', encoding=self.encoding) as f:
+            self.content = f.read()
+            f.seek(0)
+
+            while True:
+                line = f.readline()
+
+                # readline() returns an empty string when EOF is encountered
+                if not line: break
+
+                if re.match(r'(^第.+[卷|章|节|篇].*)', line):
+                    start = self.content.find(line)
+                    self.chapters.append({
+                        'title': line.strip(),
+                        'start_byte_offset': start,
+                        'end_byte_offset': start + len(line),
+                    })
+
+    def getChapterName(self, annotation_sample):
+        chapter_name = ''
+        start = self.content.find(annotation_sample)
+
+        for chapter in reversed(self.chapters):
+            if start >= chapter['start_byte_offset']:
+                chapter_name = chapter['title']
+                break
+
+        return chapter_name
 
 class EPUBChapter(Chapter):
     def __init__(self, path):
