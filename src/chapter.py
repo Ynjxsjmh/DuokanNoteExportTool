@@ -129,9 +129,9 @@ class PDFChapter(Chapter):
         chapter_index = 0
 
         try:
-            chapter_index = next(i for i,v in enumerate([outline['page']
-                                                         for outline in self.outlines])
-                                 if v > fixed_index) - 1
+            chapter_index = next(i for i, chapter_index in enumerate([outline['page']
+                                                                      for outline in self.outlines])
+                                 if chapter_index > fixed_index) - 1
         except StopIteration:
             chapter_index = len(self.outlines) - 1
 
