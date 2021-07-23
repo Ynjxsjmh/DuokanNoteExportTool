@@ -2,8 +2,52 @@ import datetime
 import itertools
 import json
 
-from chapter import EPUBChapter, DuoKanChapter, PDFChapter, TXTChapter
+from chapter import Chapter, EPUBChapter, DuoKanChapter, PDFChapter, TXTChapter
 from connector import Connector
+
+
+def _get_chapter(package_type, file_path, use_duokan_notes):
+    '''
+    package_type: str
+      File type
+    file_path: str
+      Path to book
+    use_duokan_notes: boolean
+      If true, then file_path is the path to exported duokan notes
+    '''
+    if not file_path:
+        return Chapter()
+
+    chapter = Chapter()
+
+    if package_type == 'EPUB':
+        chapter = EPUBChapter(file_path)
+    elif package_type == 'PDF':
+        chapter = PDFChapter(file_path)
+    elif package_type == 'TXT':
+        chapter = TXTChapter(file_path)
+
+    if use_duokan_notes:
+        chapter = DuoKanChapter(file_path)
+
+    return chapter
+
+
+def _get_chapter_name(chapter, package_type, index, annotations, use_duokan_notes):
+    chapter_name = str(index)
+
+    if package_type == 'EPUB':
+        chapter_id = json.loads(annotations[0][1])[0]['chapter_id']
+        chapter_name = chapter.getChapterName(chapter_id)
+    elif package_type == 'PDF':
+        chapter_name = chapter.getChapterName(index)
+    elif package_type == 'TXT':
+        chapter_name = chapter.getChapterName(annotations[0][3])
+
+    if use_duokan_notes:
+        chapter_name = chapter.getChapterName(annotations[0])
+
+    return chapter_name
 
 
 def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, time_format='%Y-%m-%d %H:%M:%S'):
@@ -15,19 +59,14 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
     package_type = annotations[0][4]
 
     index_key = ''
-    chapter = None
     if package_type == 'PDF':
         index_key = 'fixed_index'
-        chapter = PDFChapter(file_path)
     elif package_type == 'TXT':
         index_key = 'byte_offset'
-        chapter = TXTChapter(file_path)
     elif package_type == 'EPUB':
         index_key = 'chapter_index'
-        chapter = EPUBChapter(file_path)
 
-    if use_duokan_notes:
-        chapter = DuoKanChapter(file_path)
+    chapter = _get_chapter(package_type, file_path, use_duokan_notes)
 
     annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
     annotations_by_chapter = itertools.groupby(annotations, key=lambda annotation: json.loads(annotation[1])[0][index_key])
@@ -35,17 +74,8 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
     for index, annotations in annotations_by_chapter:
         annotations = list(annotations)
 
-        chapter_name = str(index)
-
-        if use_duokan_notes:
-            chapter_name = chapter.getChapterName(annotations[0])
-        elif package_type == 'EPUB':
-            chapter_id = json.loads(annotations[0][1])[0]['chapter_id']
-            chapter_name = chapter.getChapterName(chapter_id)
-        elif package_type == 'PDF':
-            chapter_name = chapter.getChapterName(index)
-        elif package_type == 'TXT':
-            chapter_name = chapter.getChapterName(annotations[0][3])
+        chapter_name = _get_chapter_name(chapter, package_type, index,
+                                         annotations, use_duokan_notes)
 
         result += '\n' + chapter_name + '\n'
 
