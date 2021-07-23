@@ -34,6 +34,12 @@ class EPUBChapter(Chapter):
 
         return manifest
 
+    def getSpine(self, book):
+        spine = [{'idref': idref, 'linear': linear}
+                 for idref, linear in book.opf.spine.itemrefs]
+
+        return spine
+
     def getToc(self, navPoints, level=0, nested=True):
         toc = []
 
@@ -59,22 +65,36 @@ class EPUBChapter(Chapter):
         book = epub.open_epub(self.path, 'r')
 
         chapters = self.getToc(book.toc.nav_map.nav_point, nested=False)
+        itemrefs = self.getSpine(book)
         items = self.getManifest(book)
 
-        chapter = self.getChapterById(chapter_id, chapters, items)
+        chapter = self.getChapterById(chapter_id, itemrefs, items, chapters)
 
         return chapter['label']
 
-    def getChapterById(self, chapter_id, chapters, items):
+    def getChapterById(self, chapter_id, itemrefs, items, chapters):
         '''
+        itemref: idref (itemref is `itemref` label in content.opf)
         item: href, id (item is `item` label in content.opf)
         chapter: src, label (chapter is `navPoint` label in toc.ncx)
-        chapter_id = item.id
+        chapter_id = itemref.idref
+        itemref.idref = item.id
         item.href = chapter.src
         '''
-        item = [item for item in items if item['id'] == chapter_id][0]
-        chapter = [chapter for chapter in chapters if chapter['src'] == item['href']][0]
-        return chapter
+        itemref = [itemref for itemref in itemrefs if itemref['idref'] == chapter_id][0]
+        item = [item for item in items if item['id'] == itemref['idref']][0]
+        chapter = [chapter for chapter in chapters if chapter['src'] == item['href']]
+
+        if len(chapter) == 0:
+            '''
+            针对从 item.href 找不到 chapter.src 的情况，
+            解决方案是找前一个 item 对应的 chapter。
+            可能存在的问题是前一个 item 不存在。
+            '''
+            previous_chapter_id = itemrefs[[itemref['idref'] for itemref in itemrefs].index(chapter_id) - 1]
+            return self.getChapterById(previous_chapter_id['idref'], itemrefs, items, chapters)
+        else:
+            return chapter[0]
 
     def getAncestorChapters(self, chapters, chapter):
         ancestor_chapters, level = [], chapter['level']
