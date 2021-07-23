@@ -2,7 +2,7 @@ import datetime
 import itertools
 import json
 
-from chapter import EPUBChapter, DuoKanChapter
+from chapter import EPUBChapter, DuoKanChapter, PDFChapter
 from connector import Connector
 
 
@@ -18,6 +18,7 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
     chapter = None
     if package_type == 'PDF':
         index_key = 'fixed_index'
+        chapter = PDFChapter(file_path)
     elif package_type == 'TXT':
         index_key = 'byte_offset'
     elif package_type == 'EPUB':
@@ -40,6 +41,8 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
         elif package_type == 'EPUB':
             chapter_id = json.loads(annotations[0][1])[0]['chapter_id']
             chapter_name = chapter.getChapterName(chapter_id)
+        elif package_type == 'PDF':
+            chapter_name = chapter.getChapterName(index)
 
         result += '\n' + chapter_name + '\n'
 
