@@ -34,7 +34,7 @@ class EPUBChapter(Chapter):
 
         return manifest
 
-    def getToc(self, navPoints, level=0):
+    def getToc(self, navPoints, level=0, nested=True):
         toc = []
 
         for navPoint in navPoints:
@@ -48,7 +48,10 @@ class EPUBChapter(Chapter):
            })
 
            if len(navPoint.nav_point):
-               toc.append(self.getToc(navPoint.nav_point, level+1))
+               if nested:
+                   toc.append(self.getToc(navPoint.nav_point, level+1))
+               else:
+                   toc.extend(self.getToc(navPoint.nav_point, level+1))
 
         return toc
 
