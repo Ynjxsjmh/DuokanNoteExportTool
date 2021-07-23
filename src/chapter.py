@@ -1,3 +1,4 @@
+import epub
 
 
 class Chapter:
@@ -17,10 +18,47 @@ class TXTChapter(Chapter):
 
 
 class EPUBChapter(Chapter):
-    def __init__(self):
-        pass
+    def __init__(self, path):
+        self.path = path
 
-    def getChapterName(self, index):
+    def getManifest(self, book):
+        manifest = []
+
+        for key in book.opf.manifest.keys():
+            manifest_item = book.opf.manifest[key]
+            manifest.append({
+                'id': manifest_item.identifier,
+                'href': manifest_item.href,
+                'media_type': manifest_item.media_type,
+            })
+
+        return manifest
+
+    def getToc(self, navPoints, level=0):
+        toc = []
+
+        for navPoint in navPoints:
+           toc.append({
+               'class': navPoint.class_name,
+               'id': navPoint.identifier,
+               'play_order': navPoint.play_order,
+               'src': navPoint.src,
+               'level': level,
+               'label': navPoint.labels[0][0],
+           })
+
+           if len(navPoint.nav_point):
+               toc.append(self.getToc(navPoint.nav_point, level+1))
+
+        return toc
+
+    def getChapterName(self, chapter_id):
+        book = epub.open_epub(self.path, 'r')
+
+        self.getToc(book.toc.nav_map.nav_point)
+        self.getManifest(book)
+
+    def getAncestorChapters(self, chapters, chapter_id):
         pass
 
 
