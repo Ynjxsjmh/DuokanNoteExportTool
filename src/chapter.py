@@ -61,6 +61,12 @@ class EPUBChapter(Chapter):
         self.getToc(book.toc.nav_map.nav_point)
         self.getManifest(book)
     def getChapterById(self, chapter_id, chapters, items):
+        '''
+        item: href, id (item is `item` label in content.opf)
+        chapter: src, label (chapter is `navPoint` label in toc.ncx)
+        chapter_id = item.id
+        item.href = chapter.src
+        '''
         item = [item for item in items if item['id'] == chapter_id][0]
         chapter = [chapter for chapter in chapters if chapter['src'] == item['href']][0]
         return chapter
