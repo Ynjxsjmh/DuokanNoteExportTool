@@ -41,7 +41,7 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
             chapter_id = json.loads(annotations[0][1])[0]['chapter_id']
             chapter_name = chapter.getChapterName(chapter_id)
 
-        result += chapter_name + '\n'
+        result += '\n' + chapter_name + '\n'
 
         for annotation in annotations:
             added_time = datetime.datetime.utcfromtimestamp(annotation[0]/1000).strftime(time_format)
@@ -54,4 +54,4 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
             if len(note_text):
                 result += '注：' + note_text + '\n'
 
-    return result
+    return result.strip()
