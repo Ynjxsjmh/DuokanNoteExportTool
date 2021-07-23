@@ -49,9 +49,9 @@ class EPUBChapter(Chapter):
 
            if len(navPoint.nav_point):
                if nested:
-                   toc.append(self.getToc(navPoint.nav_point, level+1))
+                   toc.append(self.getToc(navPoint.nav_point, level+1, nested))
                else:
-                   toc.extend(self.getToc(navPoint.nav_point, level+1))
+                   toc.extend(self.getToc(navPoint.nav_point, level+1, nested))
 
         return toc
 
