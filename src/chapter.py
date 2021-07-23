@@ -71,8 +71,17 @@ class EPUBChapter(Chapter):
         chapter = [chapter for chapter in chapters if chapter['src'] == item['href']][0]
         return chapter
 
-    def getAncestorChapters(self, chapters, chapter_id):
-        pass
+    def getAncestorChapters(self, chapters, chapter):
+        ancestor_chapters, level = [], chapter['level']
+
+        idx = [chapter['id'] for chapter in chapters].index(chapter['id'])
+
+        for cur_chapter in reversed(chapters[:idx]):
+            if cur_chapter['level'] == level - 1:
+                ancestor_chapters.append(cur_chapter)
+                level = level - 1
+
+        return ancestor_chapters
 
 
 class PDFChapter(Chapter):
