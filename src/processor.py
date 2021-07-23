@@ -33,7 +33,7 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
     for index, annotations in annotations_by_chapter:
         annotations = list(annotations)
 
-        chapter_name = index
+        chapter_name = str(index)
 
         if use_duokan_notes:
             chapter_name = chapter.getChapterName(annotations[0])
