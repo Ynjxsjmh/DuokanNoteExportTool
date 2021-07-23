@@ -15,12 +15,8 @@ class Chapter:
 
 class TXTChapter(Chapter):
     def __init__(self, path):
-        self.encoding = None
-
-        with open(path, "rb") as f:
-            content = f.read()
-            result = chardet.detect(content)
-            self.encoding = result['encoding']
+        self.path = path
+        self.encoding = self._detectEncoding(self.path)
 
         self.chapters = []
 
@@ -41,6 +37,13 @@ class TXTChapter(Chapter):
                         'start_byte_offset': start,
                         'end_byte_offset': start + len(line),
                     })
+
+    def _detectEncoding(self, path):
+        with open(path, "rb") as f:
+            content = f.read()
+            result = chardet.detect(content)
+            encoding = result['encoding']
+        return encoding
 
     def getChapterName(self, annotation_sample):
         chapter_name = ''
