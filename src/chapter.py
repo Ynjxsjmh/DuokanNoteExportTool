@@ -1,4 +1,5 @@
 import epub
+import json
 
 
 class Chapter:
@@ -118,8 +119,26 @@ class PDFChapter(Chapter):
 
 
 class DuoKanChapter:
-    def __init__(self, annotations):
-        pass
+    def __init__(self, path):
+        self.path = path
+        self.maps = self.build_maps()
+
+    def build_maps(self):
+        with open(self.path, "r") as f:
+            content = f.read()
+
+        maps = [list(map(str.strip, chapter.split('\n', 1)))
+                for chapter in content.strip().split('\n\n')]
+
+        return maps
 
     def getChapterName(self, annotation):
-        pass
+        chapter_name = ''
+        note_text = json.loads(annotation[2])['note_text']
+        annotation_sample = annotation[3]
+
+        for cur_chapter_name, annotations in self.maps:
+            if (note_text in annotations) and (annotation_sample in annotations):
+                chapter_name = cur_chapter_name
+
+        return chapter_name
