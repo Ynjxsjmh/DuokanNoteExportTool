@@ -1,5 +1,6 @@
 import epub
 import json
+from PyPDF2 import PdfFileReader
 
 
 class Chapter:
@@ -111,11 +112,48 @@ class EPUBChapter(Chapter):
 
 
 class PDFChapter(Chapter):
-    def __init__(self):
-        pass
+    def __init__(self, path):
+        self.path = path
 
-    def getChapterName(self, index):
-        pass
+        with open(self.path, 'rb') as f:
+            pdf = PdfFileReader(f)
+            outlines = pdf.getOutlines()
+            self.outlines = self.processOutlines(pdf, outlines)
+
+    def getChapterName(self, fixed_index):
+        chapter_index = self.getChapterIndex(fixed_index)
+
+        return self.outlines[chapter_index]['title']
+
+    def getChapterIndex(self, fixed_index):
+        chapter_index = 0
+
+        try:
+            chapter_index = next(i for i,v in enumerate([outline['page']
+                                                         for outline in self.outlines])
+                                 if v >= fixed_index) - 1
+        except StopIteration:
+            chapter_index = len(self.outlines) - 1
+
+        return chapter_index
+
+    def processOutlines(self, pdf, outlines, level=0):
+        results = []
+
+        for outline in outlines:
+            if isinstance(outline, list):
+                results.extend(self.processOutlines(pdf, outline, level+1))
+            else:
+                results.append({
+                    'title': outline.title,
+                    # 多看阅读的第一页是 cover
+                    # 所以会比这里得到的多一页
+                    # 但是 fixed_index 里没有多页
+                    'page': pdf.getDestinationPageNumber(outline),
+                    'level': level,
+                })
+
+        return results
 
 
 class DuoKanChapter:
