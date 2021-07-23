@@ -58,8 +58,13 @@ class EPUBChapter(Chapter):
     def getChapterName(self, chapter_id):
         book = epub.open_epub(self.path, 'r')
 
-        self.getToc(book.toc.nav_map.nav_point)
-        self.getManifest(book)
+        chapters = self.getToc(book.toc.nav_map.nav_point, nested=False)
+        items = self.getManifest(book)
+
+        chapter = self.getChapterById(chapter_id, chapters, items)
+
+        return chapter['label']
+
     def getChapterById(self, chapter_id, chapters, items):
         '''
         item: href, id (item is `item` label in content.opf)
