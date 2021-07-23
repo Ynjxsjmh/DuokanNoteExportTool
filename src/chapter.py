@@ -18,25 +18,10 @@ class TXTChapter(Chapter):
         self.path = path
         self.encoding = self._detectEncoding(self.path)
 
-        self.chapters = []
-
         with open(path, 'r', encoding=self.encoding) as f:
             self.content = f.read()
-            f.seek(0)
 
-            while True:
-                line = f.readline()
-
-                # readline() returns an empty string when EOF is encountered
-                if not line: break
-
-                if re.match(r'(^第.+[卷|章|节|篇].*)', line):
-                    start = self.content.find(line)
-                    self.chapters.append({
-                        'title': line.strip(),
-                        'start_byte_offset': start,
-                        'end_byte_offset': start + len(line),
-                    })
+        self.chapters = self._guessChapters(self.path, self.encoding, self.content)
 
     def _detectEncoding(self, path):
         with open(path, "rb") as f:
@@ -44,6 +29,26 @@ class TXTChapter(Chapter):
             result = chardet.detect(content)
             encoding = result['encoding']
         return encoding
+
+    def _guessChapters(self, path, encoding, content):
+        chapters = []
+
+        with open(path, 'r', encoding=encoding) as f:
+            while True:
+                line = f.readline()
+
+                # readline() returns an empty string when EOF is encountered
+                if not line: break
+
+                if re.match(r'(^第.+[卷|章|节|篇].*)', line):
+                    start = content.find(line)
+                    chapters.append({
+                        'title': line.strip(),
+                        'start_byte_offset': start,
+                        'end_byte_offset': start + len(line),
+                    })
+
+        return chapters
 
     def getChapterName(self, annotation_sample):
         chapter_name = ''
