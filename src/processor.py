@@ -2,10 +2,11 @@ import datetime
 import itertools
 import json
 
+from chapter import EPUBChapter
 from connector import Connector
 
 
-def export_annotations_in_books(book_id, time_format='%Y-%m-%d %H:%M:%S'):
+def export_annotations_in_books(book_id, file_path='', time_format='%Y-%m-%d %H:%M:%S'):
     connector = Connector()
 
     result = ''
@@ -14,18 +15,28 @@ def export_annotations_in_books(book_id, time_format='%Y-%m-%d %H:%M:%S'):
     package_type = annotations[0][4]
 
     index_key = ''
+    chapter = None
     if package_type == 'PDF':
         index_key = 'fixed_index'
     elif package_type == 'TXT':
         index_key = 'byte_offset'
     elif package_type == 'EPUB':
         index_key = 'chapter_index'
+        chapter = EPUBChapter(file_path)
 
     annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
     annotations_by_chapter = itertools.groupby(annotations, key=lambda annotation: json.loads(annotation[1])[0][index_key])
 
-    for chapter, annotations in annotations_by_chapter:
-        result += str(chapter) + '\n'
+    for index, annotations in annotations_by_chapter:
+        annotations = list(annotations)
+
+        chapter_name = index
+
+        if package_type == 'EPUB':
+            chapter_id = json.loads(annotations[0][1])[0]['chapter_id']
+            chapter_name = chapter.getChapterName(chapter_id)
+
+        result += chapter_name + '\n'
 
         for annotation in annotations:
             added_time = datetime.datetime.utcfromtimestamp(annotation[0]/1000).strftime(time_format)
