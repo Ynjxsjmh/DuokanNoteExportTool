@@ -53,8 +53,6 @@ def _get_chapter_name(chapter, package_type, index, annotations, use_duokan_note
 def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, time_format='%Y-%m-%d %H:%M:%S'):
     connector = Connector()
 
-    result = ''
-
     annotations = connector.find_annotations_in_book(book_id)
     package_type = annotations[0][4]
 
@@ -71,23 +69,51 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
     annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
     annotations_by_chapter = itertools.groupby(annotations, key=lambda annotation: json.loads(annotation[1])[0][index_key])
 
+    annotations_by_chapter_with_chapter_name = []
     for index, annotations in annotations_by_chapter:
         annotations = list(annotations)
-
         chapter_name = _get_chapter_name(chapter, package_type, index,
                                          annotations, use_duokan_notes)
 
-        result += '\n' + chapter_name + '\n'
-
+        annotation_by_chapter_with_chapter_name = []
         for annotation in annotations:
             added_time = datetime.datetime.utcfromtimestamp(annotation[0]/1000).strftime(time_format)
             note_text = json.loads(annotation[2])['note_text']
             annotation_sample = annotation[3]
 
-            result += added_time + '\n'
-            result += annotation_sample + '\n'
+            result = added_time + '\n' + annotation_sample + '\n'
 
             if len(note_text):
                 result += '注：' + note_text + '\n'
+
+            annotation_by_chapter_with_chapter_name.append((chapter_name, result))
+
+        annotations_by_chapter_with_chapter_name.append(annotation_by_chapter_with_chapter_name)
+
+    annotations_by_chapter_name = []
+    i = 0
+    while i < len(annotations_by_chapter_with_chapter_name):
+        annotations_i = annotations_by_chapter_with_chapter_name[i]
+        annotation_by_chapter_name = annotations_i
+
+        j = i + 1
+
+        while j < len(annotations_by_chapter_with_chapter_name):
+            annotations_j = annotations_by_chapter_with_chapter_name[j]
+
+            if annotations_i[0][0] == annotations_j[0][0]:
+                annotation_by_chapter_name += annotations_j
+                j = j + 1
+            else:
+                break
+
+        annotations_by_chapter_name.append(annotation_by_chapter_name)
+        i = j
+
+    result = ''
+    for annotation_by_chapter_name in annotations_by_chapter_name:
+        result += '\n' + annotation_by_chapter_name[0][0] + '\n'
+        for chapter_name, annotation in annotation_by_chapter_name:
+            result += annotation
 
     return result.strip()
