@@ -2,11 +2,11 @@ import datetime
 import itertools
 import json
 
-from chapter import EPUBChapter
+from chapter import EPUBChapter, DuoKanChapter
 from connector import Connector
 
 
-def export_annotations_in_books(book_id, file_path='', time_format='%Y-%m-%d %H:%M:%S'):
+def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, time_format='%Y-%m-%d %H:%M:%S'):
     connector = Connector()
 
     result = ''
@@ -24,6 +24,9 @@ def export_annotations_in_books(book_id, file_path='', time_format='%Y-%m-%d %H:
         index_key = 'chapter_index'
         chapter = EPUBChapter(file_path)
 
+    if use_duokan_notes:
+        chapter = DuoKanChapter(file_path)
+
     annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
     annotations_by_chapter = itertools.groupby(annotations, key=lambda annotation: json.loads(annotation[1])[0][index_key])
 
@@ -32,7 +35,9 @@ def export_annotations_in_books(book_id, file_path='', time_format='%Y-%m-%d %H:
 
         chapter_name = index
 
-        if package_type == 'EPUB':
+        if use_duokan_notes:
+            chapter_name = chapter.getChapterName(annotations[0])
+        elif package_type == 'EPUB':
             chapter_id = json.loads(annotations[0][1])[0]['chapter_id']
             chapter_name = chapter.getChapterName(chapter_id)
 
