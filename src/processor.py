@@ -73,8 +73,14 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
     annotations_by_chapter_with_chapter_name = []
     for index, annotations in annotations_by_chapter:
         annotations = list(annotations)
-        chapter_name = _get_chapter_name(chapter, package_type, index,
-                                         annotations, use_duokan_notes)
+
+        if file_path:
+            # If not specific file path, then use info in
+            # annotations.annotation_range as chapter name
+            chapter_name = _get_chapter_name(chapter, package_type, index,
+                                             annotations, use_duokan_notes)
+        else:
+            chapter_name = str(index)
 
         annotation_by_chapter_with_chapter_name = []
         for annotation in annotations:
