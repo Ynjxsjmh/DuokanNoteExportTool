@@ -15,10 +15,13 @@ def _get_chapter(package_type, file_path, use_duokan_notes):
     use_duokan_notes: boolean
       If true, then file_path is the path to exported duokan notes
     '''
-    if not file_path:
-        return Chapter()
+    chapter = None
 
-    chapter = Chapter()
+    if not file_path:
+        return chapter
+
+    if use_duokan_notes:
+        return DuoKanChapter(file_path)
 
     if package_type == 'EPUB':
         chapter = EPUBChapter(file_path)
@@ -27,14 +30,11 @@ def _get_chapter(package_type, file_path, use_duokan_notes):
     elif package_type == 'TXT':
         chapter = TXTChapter(file_path)
 
-    if use_duokan_notes:
-        chapter = DuoKanChapter(file_path)
-
     return chapter
 
 
 def _get_chapter_name(chapter, package_type, index, annotations, use_duokan_notes):
-    chapter_name = str(index)
+    arg = index
 
     if package_type == 'EPUB':
         arg = json.loads(annotations[0][1])[0]['chapter_id']
