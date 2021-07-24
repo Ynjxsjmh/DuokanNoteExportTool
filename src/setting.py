@@ -91,3 +91,13 @@ class ExportSetting:
     @export_dir.setter
     def export_dir(self, export_dir):
         self._export_dir = export_dir
+
+    def __str__(self):
+        return 'db_path: {}, time_format: {}, sort_type: {}, outline_type: {}, export_dir: {}'.format(
+            self._db_path,
+            self._time_format,
+            self._sort_type,
+            self._outline_type,
+            self._export_dir,
+        )
+
