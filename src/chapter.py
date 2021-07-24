@@ -61,6 +61,7 @@ class TXTChapter(Chapter):
 
         return chapter_name
 
+
 class EPUBChapter(Chapter):
     def __init__(self, path):
         self.path = path
