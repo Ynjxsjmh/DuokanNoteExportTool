@@ -3,6 +3,75 @@ from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 
 
+class SettingDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        timeFormatGroupBox = self.createTimeFormatGroupBox()
+        outlineFormatGroupBox = self.createOutlineFormatGroupBox()
+        annotationSortGroupBox = self.createAnnotationSortGroupBox()
+
+        mainLayout = QGridLayout()
+        mainLayout.addWidget(timeFormatGroupBox, 0, 0)
+        mainLayout.addWidget(outlineFormatGroupBox, 1, 0)
+        mainLayout.addWidget(annotationSortGroupBox, 2, 0)
+
+        self.setLayout(mainLayout)
+        self.setWindowTitle('导出设置')
+
+    def createTimeFormatGroupBox(self):
+        timeFormatGroupBox = QGroupBox('时间格式')
+
+        from datetime import datetime
+        now = datetime.now()
+
+        timeFormatRadioButton1 = QRadioButton(now.strftime('%Y-%m-%d'))
+        timeFormatRadioButton2 = QRadioButton(now.strftime('%Y 年 %m 月 %d 日'))
+        timeFormatRadioButton3 = QRadioButton(now.strftime('%Y-%m-%d %H:%M:%S'))
+        timeFormatRadioButton4 = QRadioButton(now.strftime('%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒'))
+        timeFormatRadioButton3.setChecked(True)
+
+        layout = QVBoxLayout()
+        layout.addWidget(timeFormatRadioButton1)
+        layout.addWidget(timeFormatRadioButton2)
+        layout.addWidget(timeFormatRadioButton3)
+        layout.addWidget(timeFormatRadioButton4)
+        timeFormatGroupBox.setLayout(layout)
+
+        return timeFormatGroupBox
+
+    def createOutlineFormatGroupBox(self):
+        outlineFormatGroupBox = QGroupBox('目录格式')
+
+        outlineFormatRadioButton1 = QRadioButton('无格式')
+        outlineFormatRadioButton2 = QRadioButton('Markdown 格式')
+        outlineFormatRadioButton3 = QRadioButton('Org 格式')
+
+        outlineFormatRadioButton1.setChecked(True)
+
+        layout = QVBoxLayout()
+        layout.addWidget(outlineFormatRadioButton1)
+        layout.addWidget(outlineFormatRadioButton2)
+        layout.addWidget(outlineFormatRadioButton3)
+        outlineFormatGroupBox.setLayout(layout)
+
+        return outlineFormatGroupBox
+
+    def createAnnotationSortGroupBox(self):
+        annotationSortGroupBox = QGroupBox('想法排序方式')
+
+        radioButton1 = QRadioButton('按章节')
+        radioButton2 = QRadioButton('按时间')
+        radioButton1.setChecked(True)
+
+        layout = QVBoxLayout()
+        layout.addWidget(radioButton1)
+        layout.addWidget(radioButton2)
+        annotationSortGroupBox.setLayout(layout)
+
+        return annotationSortGroupBox
+
+
 class WidgetGallery(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
