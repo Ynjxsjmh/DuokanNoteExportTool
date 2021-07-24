@@ -1,3 +1,5 @@
+import re
+
 from pdfminer.pdfdocument import PDFDocument, PDFNoOutlines
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
@@ -93,3 +95,33 @@ class PdfminerOutline:
             pass
 
         return results
+
+
+class TXTOutline:
+
+    @staticmethod
+    def getOutlines(path, encoding, content):
+        outlines = TXTOutline._guessOutlines(path, encoding, content)
+
+        return outlines
+
+    @staticmethod
+    def _guessOutlines(path, encoding, content):
+        chapters = []
+
+        with open(path, 'r', encoding=encoding) as f:
+            while True:
+                line = f.readline()
+
+                # readline() returns an empty string when EOF is encountered
+                if not line: break
+
+                if re.match(r'(^第.+[卷|章|节|篇].*)', line):
+                    start = content.find(line)
+                    chapters.append({
+                        'title': line.strip(),
+                        'start_byte_offset': start,
+                        'end_byte_offset': start + len(line),
+                    })
+
+        return chapters
