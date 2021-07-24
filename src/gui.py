@@ -112,7 +112,7 @@ class SettingDialog(QDialog):
         for widget in self.outlineFormatGroupBox.children():
             if isinstance(widget, QRadioButton):
                 if widget.isChecked():
-                    self.exportSetting.outline_format = widget.value
+                    self.exportSetting.outline_type = widget.value
 
         for widget in self.annotationSortGroupBox.children():
             if isinstance(widget, QRadioButton):
