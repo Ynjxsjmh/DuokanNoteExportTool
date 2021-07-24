@@ -137,8 +137,8 @@ class WidgetGallery(QDialog):
         topLayout = QHBoxLayout()
         topLayout.addWidget(openFileButton)
         topLayout.addWidget(settingButton)
-        topLayout.addWidget(closeWindowButton)
         topLayout.addWidget(aboutButton)
+        topLayout.addWidget(closeWindowButton)
 
         return topLayout
 
