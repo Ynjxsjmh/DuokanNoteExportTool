@@ -9,6 +9,33 @@ from pdfminer.psparser import PSLiteral
 from PyPDF2 import PdfFileReader
 
 
+class EPUBOutline:
+
+    @staticmethod
+    def getOutlines(book):
+        outlines = EPUBOutline._processOutlines(book.toc.nav_map.nav_point)
+        return outlines
+
+    @staticmethod
+    def _processOutlines(navPoints, level=0):
+        outlines = []
+
+        for navPoint in navPoints:
+           outlines.append({
+               'class': navPoint.class_name,
+               'id': navPoint.identifier,
+               'play_order': navPoint.play_order,
+               'src': navPoint.src,
+               'level': level,
+               'label': navPoint.labels[0][0],
+           })
+
+           if len(navPoint.nav_point):
+               outlines.extend(EPUBOutline._processOutlines(navPoint.nav_point, level+1))
+
+        return outlines
+
+
 class PyPDF2Outline:
     @staticmethod
     def getOutlines(path):

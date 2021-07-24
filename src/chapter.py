@@ -2,7 +2,8 @@ import cchardet as chardet
 import epub
 import json
 
-from outline import PyPDF2Outline, PdfminerOutline, TXTOutline
+from outline import PyPDF2Outline, PdfminerOutline,\
+                    TXTOutline, EPUBOutline
 
 
 class Chapter:
@@ -43,7 +44,11 @@ class TXTChapter(Chapter):
 
 class EPUBChapter(Chapter):
     def __init__(self, path):
-        self.path = path
+        book = epub.open_epub(path, 'r')
+
+        self.outlines = EPUBOutline.getOutlines(book)
+        self.itemrefs = self.getSpine(book)
+        self.items = self.getManifest(book)
 
     def getManifest(self, book):
         manifest = []
@@ -64,35 +69,8 @@ class EPUBChapter(Chapter):
 
         return spine
 
-    def getToc(self, navPoints, level=0, nested=True):
-        toc = []
-
-        for navPoint in navPoints:
-           toc.append({
-               'class': navPoint.class_name,
-               'id': navPoint.identifier,
-               'play_order': navPoint.play_order,
-               'src': navPoint.src,
-               'level': level,
-               'label': navPoint.labels[0][0],
-           })
-
-           if len(navPoint.nav_point):
-               if nested:
-                   toc.append(self.getToc(navPoint.nav_point, level+1, nested))
-               else:
-                   toc.extend(self.getToc(navPoint.nav_point, level+1, nested))
-
-        return toc
-
     def getChapterName(self, chapter_id):
-        book = epub.open_epub(self.path, 'r')
-
-        chapters = self.getToc(book.toc.nav_map.nav_point, nested=False)
-        itemrefs = self.getSpine(book)
-        items = self.getManifest(book)
-
-        chapter = self.getChapterById(chapter_id, itemrefs, items, chapters)
+        chapter = self.getChapterById(chapter_id, self.itemrefs, self.items, self.outlines)
 
         return chapter['label']
 
