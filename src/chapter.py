@@ -1,8 +1,9 @@
 import cchardet as chardet
 import epub
 import json
-from PyPDF2 import PdfFileReader
 import re
+
+from outline import PyPDF2Outline
 
 
 class Chapter:
@@ -156,12 +157,7 @@ class EPUBChapter(Chapter):
 
 class PDFChapter(Chapter):
     def __init__(self, path):
-        self.path = path
-
-        with open(self.path, 'rb') as f:
-            pdf = PdfFileReader(f)
-            outlines = pdf.getOutlines()
-            self.outlines = self.processOutlines(pdf, outlines)
+        self.outlines = PyPDF2Outline.getOutlines(path)
 
     def getChapterName(self, fixed_index):
         chapter_index = self.getChapterIndex(fixed_index)
@@ -179,24 +175,6 @@ class PDFChapter(Chapter):
             chapter_index = len(self.outlines) - 1
 
         return chapter_index
-
-    def processOutlines(self, pdf, outlines, level=0):
-        results = []
-
-        for outline in outlines:
-            if isinstance(outline, list):
-                results.extend(self.processOutlines(pdf, outline, level+1))
-            else:
-                results.append({
-                    'title': outline.title,
-                    # 多看阅读的第一页是 cover
-                    # 所以会比这里得到的多一页
-                    # 但是 fixed_index 里没有多页
-                    'page': pdf.getDestinationPageNumber(outline),
-                    'level': level,
-                })
-
-        return results
 
 
 class DuoKanChapter:
