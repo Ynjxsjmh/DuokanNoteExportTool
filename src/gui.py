@@ -147,6 +147,7 @@ class DuoKanExportToolDialog(QDialog):
         bookListGroupBox.setAlignment(Qt.AlignCenter)
 
         tableWidget = QTableWidget(5, 5)
+        tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         tableWidget.setHorizontalHeaderLabels([
             '编号', '书名', '作者', '划线数', '想法数'
         ])
@@ -164,6 +165,7 @@ class DuoKanExportToolDialog(QDialog):
         selectedBookListGroupBox.setAlignment(Qt.AlignCenter)
 
         tableWidget = QTableWidget(0, 5)
+        tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         tableWidget.setHorizontalHeaderLabels([
             '编号', '书名', '作者', '划线数', '想法数'
         ])
