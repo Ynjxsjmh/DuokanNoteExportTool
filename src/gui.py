@@ -146,7 +146,10 @@ class DuoKanExportToolDialog(QDialog):
         bookListGroupBox = QGroupBox('书籍列表')
         bookListGroupBox.setAlignment(Qt.AlignCenter)
 
-        tableWidget = QTableWidget(10, 10)
+        tableWidget = QTableWidget(5, 5)
+        tableWidget.setHorizontalHeaderLabels([
+            '编号', '书名', '作者', '划线数', '想法数'
+        ])
 
         hboxLayout = QHBoxLayout()
         hboxLayout.setContentsMargins(5, 5, 5, 5)
@@ -160,7 +163,10 @@ class DuoKanExportToolDialog(QDialog):
         selectedBookListGroupBox = QGroupBox('已选书籍')
         selectedBookListGroupBox.setAlignment(Qt.AlignCenter)
 
-        tableWidget = QTableWidget(0, 0)
+        tableWidget = QTableWidget(0, 5)
+        tableWidget.setHorizontalHeaderLabels([
+            '编号', '书名', '作者', '划线数', '想法数'
+        ])
 
         defaultPushButton = QPushButton('导出')
         defaultPushButton.setDefault(True)
