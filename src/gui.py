@@ -170,11 +170,28 @@ class DuoKanExportToolDialog(QDialog):
             '编号', '书名', '作者', '划线数', '想法数'
         ])
 
+        exportDirLabel = QLabel('导出路径：')
+        exportDirText = QLineEdit()
+
+        folderButton = QPushButton('选择')
+        folderButton.setDefault(True)
+        def selectFolder():
+            path = str(QFileDialog.getExistingDirectory(self, 'Select Directory'))
+            if path:
+                exportDirText.setText(path)
+        folderButton.clicked.connect(selectFolder)
+
+        hboxLayout = QHBoxLayout()
+        hboxLayout.addWidget(exportDirLabel)
+        hboxLayout.addWidget(exportDirText)
+        hboxLayout.addWidget(folderButton)
+
         defaultPushButton = QPushButton('导出')
         defaultPushButton.setDefault(True)
 
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(tableWidget)
+        vboxLayout.addLayout(hboxLayout)
         vboxLayout.addWidget(defaultPushButton, 0, Qt.AlignCenter)
 
         selectedBookListGroupBox.setLayout(vboxLayout)
