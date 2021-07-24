@@ -20,7 +20,7 @@ class TXTChapter(Chapter):
         with open(path, 'r', encoding=self.encoding) as f:
             self.content = f.read()
 
-        self.chapters = TXTOutline.getOutlines(path, self.encoding, self.content)
+        self.outlines = TXTOutline.getOutlines(path, self.encoding, self.content)
 
     def _detectEncoding(self, path):
         with open(path, "rb") as f:
@@ -33,9 +33,9 @@ class TXTChapter(Chapter):
         chapter_name = ''
         start = self.content.find(annotation_sample)
 
-        for chapter in reversed(self.chapters):
-            if start >= chapter['start_byte_offset']:
-                chapter_name = chapter['title']
+        for outline in reversed(self.outlines):
+            if start >= outline['start_byte_offset']:
+                chapter_name = outline['title']
                 break
 
         return chapter_name
