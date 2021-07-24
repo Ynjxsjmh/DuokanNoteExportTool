@@ -2,6 +2,7 @@ from PyQt5.QtCore import QDateTime, Qt, QTimer
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 
+from setting import SortType, OutlineType, ExportSetting
 
 
 class MyRadioButton(QRadioButton):
@@ -11,19 +12,21 @@ class MyRadioButton(QRadioButton):
 
 
 class SettingDialog(QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, exportSetting, parent=None):
         super().__init__(parent)
 
-        timeFormatGroupBox = self.createTimeFormatGroupBox()
-        outlineFormatGroupBox = self.createOutlineFormatGroupBox()
-        annotationSortGroupBox = self.createAnnotationSortGroupBox()
-        bottomLayout = self.createBottomLayout()
+        self.exportSetting = exportSetting
+
+        self.timeFormatGroupBox = self.createTimeFormatGroupBox()
+        self.outlineFormatGroupBox = self.createOutlineFormatGroupBox()
+        self.annotationSortGroupBox = self.createAnnotationSortGroupBox()
+        self.bottomLayout = self.createBottomLayout()
 
         mainLayout = QGridLayout()
-        mainLayout.addWidget(timeFormatGroupBox, 0, 0)
-        mainLayout.addWidget(outlineFormatGroupBox, 1, 0)
-        mainLayout.addWidget(annotationSortGroupBox, 2, 0)
-        mainLayout.addLayout(bottomLayout, 3, 0)
+        mainLayout.addWidget(self.timeFormatGroupBox, 0, 0)
+        mainLayout.addWidget(self.outlineFormatGroupBox, 1, 0)
+        mainLayout.addWidget(self.annotationSortGroupBox, 2, 0)
+        mainLayout.addLayout(self.bottomLayout, 3, 0)
 
         self.setLayout(mainLayout)
         self.setWindowTitle('导出设置')
@@ -34,10 +37,11 @@ class SettingDialog(QDialog):
         from datetime import datetime
         now = datetime.now()
 
-        timeFormatRadioButton1 = QRadioButton(now.strftime('%Y-%m-%d'))
-        timeFormatRadioButton2 = QRadioButton(now.strftime('%Y 年 %m 月 %d 日'))
-        timeFormatRadioButton3 = QRadioButton(now.strftime('%Y-%m-%d %H:%M:%S'))
-        timeFormatRadioButton4 = QRadioButton(now.strftime('%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒'))
+        timeFormatRadioButton1 = MyRadioButton(now.strftime('%Y-%m-%d'), '%Y-%m-%d')
+        timeFormatRadioButton2 = MyRadioButton(now.strftime('%Y 年 %m 月 %d 日'), '%Y 年 %m 月 %d 日')
+        timeFormatRadioButton3 = MyRadioButton(now.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
+        timeFormatRadioButton4 = MyRadioButton(now.strftime('%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒'),
+                                               '%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒')
         timeFormatRadioButton3.setChecked(True)
 
         layout = QVBoxLayout()
@@ -52,9 +56,9 @@ class SettingDialog(QDialog):
     def createOutlineFormatGroupBox(self):
         outlineFormatGroupBox = QGroupBox('目录格式')
 
-        outlineFormatRadioButton1 = QRadioButton('无格式')
-        outlineFormatRadioButton2 = QRadioButton('Markdown 格式')
-        outlineFormatRadioButton3 = QRadioButton('Org 格式')
+        outlineFormatRadioButton1 = MyRadioButton('无格式', OutlineType.ORIGIN)
+        outlineFormatRadioButton2 = MyRadioButton('Markdown 格式', OutlineType.MD)
+        outlineFormatRadioButton3 = MyRadioButton('Org 格式', OutlineType.ORG)
 
         outlineFormatRadioButton1.setChecked(True)
 
@@ -69,8 +73,8 @@ class SettingDialog(QDialog):
     def createAnnotationSortGroupBox(self):
         annotationSortGroupBox = QGroupBox('想法排序方式')
 
-        radioButton1 = QRadioButton('按章节')
-        radioButton2 = QRadioButton('按时间')
+        radioButton1 = MyRadioButton('按章节', SortType.CHAPTER)
+        radioButton2 = MyRadioButton('按时间', SortType.TIME)
         radioButton1.setChecked(True)
 
         layout = QVBoxLayout()
@@ -83,6 +87,10 @@ class SettingDialog(QDialog):
     def createBottomLayout(self):
         saveButton = QPushButton('保存')
         saveButton.setDefault(True)
+        def save():
+            self.saveExportSetting()
+            QMessageBox.about(self, '提示', '保存成功')
+        saveButton.clicked.connect(save)
 
         closeWindowButton = QPushButton('关闭')
         closeWindowButton.setDefault(True)
@@ -94,10 +102,29 @@ class SettingDialog(QDialog):
 
         return bottomLayout
 
+    def saveExportSetting(self):
+
+        for widget in self.timeFormatGroupBox.children():
+            if isinstance(widget, QRadioButton):
+                if widget.isChecked():
+                    self.exportSetting.time_format = widget.value
+
+        for widget in self.outlineFormatGroupBox.children():
+            if isinstance(widget, QRadioButton):
+                if widget.isChecked():
+                    self.exportSetting.outline_format = widget.value
+
+        for widget in self.annotationSortGroupBox.children():
+            if isinstance(widget, QRadioButton):
+                if widget.isChecked():
+                    self.exportSetting.sort_type = widget.value
+
 
 class DuoKanExportToolDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+        self.exportSetting = ExportSetting()
 
         topLayout = self.createTopLayout()
         bookListGroupBox = self.createBookListGroupBox()
@@ -120,14 +147,13 @@ class DuoKanExportToolDialog(QDialog):
         def openFile():
             path = QFileDialog.getOpenFileName(self, 'Open', filter='db(*.db)')[0]
             if path:
-                text.setPlainText(open(path).read())
-                file_path = path
+                self.exportSetting.db_path = path
         openFileButton.clicked.connect(openFile)
 
         settingButton = QPushButton('设置')
         settingButton.setDefault(True)
         def setPreference():
-            settingDialog = SettingDialog()
+            settingDialog = SettingDialog(self.exportSetting)
             settingDialog.exec_()
         settingButton.clicked.connect(setPreference)
 
@@ -186,6 +212,7 @@ class DuoKanExportToolDialog(QDialog):
             path = str(QFileDialog.getExistingDirectory(self, 'Select Directory'))
             if path:
                 exportDirText.setText(path)
+                self.exportSetting.export_dir = path
         folderButton.clicked.connect(selectFolder)
 
         hboxLayout = QHBoxLayout()
