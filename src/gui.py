@@ -3,6 +3,13 @@ from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 
 
+
+class MyRadioButton(QRadioButton):
+    def __init__(self, text, value=''):
+        super(MyRadioButton, self).__init__(text)
+        self.value = value
+
+
 class SettingDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
