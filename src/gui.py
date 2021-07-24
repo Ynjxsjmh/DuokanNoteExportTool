@@ -111,7 +111,7 @@ class DuoKanExportToolDialog(QDialog):
         openFileButton = QPushButton('打开')
         openFileButton.setDefault(True)
         def openFile():
-            path = QFileDialog.getOpenFileName(self, "Open")[0]
+            path = QFileDialog.getOpenFileName(self, 'Open', filter='db(*.db)')[0]
             if path:
                 text.setPlainText(open(path).read())
                 file_path = path
