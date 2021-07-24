@@ -10,11 +10,13 @@ class SettingDialog(QDialog):
         timeFormatGroupBox = self.createTimeFormatGroupBox()
         outlineFormatGroupBox = self.createOutlineFormatGroupBox()
         annotationSortGroupBox = self.createAnnotationSortGroupBox()
+        bottomLayout = self.createBottomLayout()
 
         mainLayout = QGridLayout()
         mainLayout.addWidget(timeFormatGroupBox, 0, 0)
         mainLayout.addWidget(outlineFormatGroupBox, 1, 0)
         mainLayout.addWidget(annotationSortGroupBox, 2, 0)
+        mainLayout.addLayout(bottomLayout, 3, 0)
 
         self.setLayout(mainLayout)
         self.setWindowTitle('导出设置')
@@ -70,6 +72,20 @@ class SettingDialog(QDialog):
         annotationSortGroupBox.setLayout(layout)
 
         return annotationSortGroupBox
+
+    def createBottomLayout(self):
+        saveButton = QPushButton('保存')
+        saveButton.setDefault(True)
+
+        closeWindowButton = QPushButton('关闭')
+        closeWindowButton.setDefault(True)
+        closeWindowButton.clicked.connect(self.accept)
+
+        bottomLayout = QHBoxLayout()
+        bottomLayout.addWidget(saveButton)
+        bottomLayout.addWidget(closeWindowButton)
+
+        return bottomLayout
 
 
 class WidgetGallery(QDialog):
