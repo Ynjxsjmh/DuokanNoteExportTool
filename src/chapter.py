@@ -72,7 +72,7 @@ class EPUBChapter(Chapter):
     def getChapterName(self, chapter_id):
         chapter = self.getChapterById(chapter_id, self.itemrefs, self.items, self.outlines)
 
-        return chapter['label']
+        return chapter['title']
 
     def getChapterById(self, chapter_id, itemrefs, items, chapters):
         '''

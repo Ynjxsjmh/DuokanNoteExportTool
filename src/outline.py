@@ -27,7 +27,7 @@ class EPUBOutline:
                'play_order': navPoint.play_order,
                'src': navPoint.src,
                'level': level,
-               'label': navPoint.labels[0][0],
+               'title': navPoint.labels[0][0],
            })
 
            if len(navPoint.nav_point):
