@@ -37,15 +37,16 @@ def _get_chapter_name(chapter, package_type, index, annotations, use_duokan_note
     chapter_name = str(index)
 
     if package_type == 'EPUB':
-        chapter_id = json.loads(annotations[0][1])[0]['chapter_id']
-        chapter_name = chapter.getChapterName(chapter_id)
+        arg = json.loads(annotations[0][1])[0]['chapter_id']
     elif package_type == 'PDF':
-        chapter_name = chapter.getChapterName(index)
+        arg = index
     elif package_type == 'TXT':
-        chapter_name = chapter.getChapterName(annotations[0][3])
+        arg = annotations[0][3]
 
     if use_duokan_notes:
-        chapter_name = chapter.getChapterName(annotations[0])
+        arg = annotations[0]
+
+    chapter_name = chapter.getChapterName(arg)
 
     return chapter_name
 
