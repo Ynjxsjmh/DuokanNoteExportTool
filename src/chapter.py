@@ -3,7 +3,7 @@ import epub
 import json
 import re
 
-from outline import PyPDF2Outline
+from outline import PyPDF2Outline, PdfminerOutline
 
 
 class Chapter:
@@ -157,7 +157,7 @@ class EPUBChapter(Chapter):
 
 class PDFChapter(Chapter):
     def __init__(self, path):
-        self.outlines = PyPDF2Outline.getOutlines(path)
+        self.outlines = PdfminerOutline.getOutlines(path)
 
     def getChapterName(self, fixed_index):
         chapter_index = self.getChapterIndex(fixed_index)
