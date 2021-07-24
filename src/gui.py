@@ -88,7 +88,7 @@ class SettingDialog(QDialog):
         return bottomLayout
 
 
-class WidgetGallery(QDialog):
+class DuoKanExportToolDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -187,6 +187,6 @@ if __name__ == '__main__':
     import sys
 
     app = QApplication(sys.argv)
-    gallery = WidgetGallery()
-    gallery.show()
+    tool = DuoKanExportToolDialog()
+    tool.show()
     sys.exit(app.exec_())
