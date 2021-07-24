@@ -1,26 +1,61 @@
 from PyQt5.QtCore import QDateTime, Qt, QTimer
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
-        QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-        QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
-        QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
-        QVBoxLayout, QWidget)
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import *
 
 
 class WidgetGallery(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        topLayout = self.createTopLayout()
         bookListGroupBox = self.createBookListGroupBox()
         selectedBookListGroupBox = self.createSelectedBookListGroupBox()
         progressBar = self.createProgressBar()
 
         mainLayout = QGridLayout()
-        mainLayout.addWidget(bookListGroupBox, 1, 0)
-        mainLayout.addWidget(selectedBookListGroupBox, 2, 0)
+        mainLayout.addLayout(topLayout, 0, 0, 1, 2)
+        mainLayout.addWidget(bookListGroupBox, 2, 0)
+        mainLayout.addWidget(selectedBookListGroupBox, 3, 0)
         mainLayout.addWidget(progressBar, 4, 0, 1, 2)
 
         self.setLayout(mainLayout)
         self.setWindowTitle('多看导出助手')
+
+    def createTopLayout(self):
+
+        openFileButton = QPushButton('打开')
+        openFileButton.setDefault(True)
+        def openFile():
+            path = QFileDialog.getOpenFileName(self, "Open")[0]
+            if path:
+                text.setPlainText(open(path).read())
+                file_path = path
+        openFileButton.clicked.connect(openFile)
+
+        settingButton = QPushButton('设置')
+        settingButton.setDefault(True)
+        def setPreference():
+            settingDialog = SettingDialog()
+            settingDialog.exec_()
+        settingButton.clicked.connect(setPreference)
+
+        closeWindowButton = QPushButton('关闭')
+        closeWindowButton.setDefault(True)
+        closeWindowButton.clicked.connect(self.accept)
+
+        aboutButton = QPushButton('关于')
+        def showAboutDialog():
+            text = 'Ynjxsjmh'
+            QMessageBox.about(self, '关于多看导出助手', text)
+        aboutButton.clicked.connect(showAboutDialog)
+
+        topLayout = QHBoxLayout()
+        topLayout.addWidget(openFileButton)
+        topLayout.addWidget(settingButton)
+        topLayout.addWidget(closeWindowButton)
+        topLayout.addWidget(aboutButton)
+
+        return topLayout
 
     def createBookListGroupBox(self):
         bookListGroupBox = QGroupBox('书籍列表')
