@@ -37,18 +37,19 @@ class SettingDialog(QDialog):
         from datetime import datetime
         now = datetime.now()
 
-        timeFormatRadioButton1 = MyRadioButton(now.strftime('%Y-%m-%d'), '%Y-%m-%d')
-        timeFormatRadioButton2 = MyRadioButton(now.strftime('%Y 年 %m 月 %d 日'), '%Y 年 %m 月 %d 日')
-        timeFormatRadioButton3 = MyRadioButton(now.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S')
-        timeFormatRadioButton4 = MyRadioButton(now.strftime('%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒'),
-                                               '%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒')
-        timeFormatRadioButton3.setChecked(True)
+        timeFormatRadioButtons = [MyRadioButton(now.strftime('%Y-%m-%d'), '%Y-%m-%d'),
+                                  MyRadioButton(now.strftime('%Y 年 %m 月 %d 日'), '%Y 年 %m 月 %d 日'),
+                                  MyRadioButton(now.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S'),
+                                  MyRadioButton(now.strftime('%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒'),
+                                                             '%Y 年 %m 月 %d 日 %H 时 %M 分 %S 秒')]
 
         layout = QVBoxLayout()
-        layout.addWidget(timeFormatRadioButton1)
-        layout.addWidget(timeFormatRadioButton2)
-        layout.addWidget(timeFormatRadioButton3)
-        layout.addWidget(timeFormatRadioButton4)
+
+        for button in timeFormatRadioButtons:
+            if button.value == self.exportSetting.time_format:
+                button.setChecked(True)
+            layout.addWidget(button)
+
         timeFormatGroupBox.setLayout(layout)
 
         return timeFormatGroupBox
@@ -56,16 +57,17 @@ class SettingDialog(QDialog):
     def createOutlineFormatGroupBox(self):
         outlineFormatGroupBox = QGroupBox('目录格式')
 
-        outlineFormatRadioButton1 = MyRadioButton('无格式', OutlineType.ORIGIN)
-        outlineFormatRadioButton2 = MyRadioButton('Markdown 格式', OutlineType.MD)
-        outlineFormatRadioButton3 = MyRadioButton('Org 格式', OutlineType.ORG)
-
-        outlineFormatRadioButton1.setChecked(True)
+        outlineFormatRadioButtons = [MyRadioButton('无格式', OutlineType.ORIGIN),
+                                     MyRadioButton('Markdown 格式', OutlineType.MD),
+                                     MyRadioButton('Org 格式', OutlineType.ORG)]
 
         layout = QVBoxLayout()
-        layout.addWidget(outlineFormatRadioButton1)
-        layout.addWidget(outlineFormatRadioButton2)
-        layout.addWidget(outlineFormatRadioButton3)
+
+        for button in outlineFormatRadioButtons:
+            if button.value == self.exportSetting.outline_type:
+                button.setChecked(True)
+            layout.addWidget(button)
+
         outlineFormatGroupBox.setLayout(layout)
 
         return outlineFormatGroupBox
@@ -73,13 +75,16 @@ class SettingDialog(QDialog):
     def createAnnotationSortGroupBox(self):
         annotationSortGroupBox = QGroupBox('想法排序方式')
 
-        radioButton1 = MyRadioButton('按章节', SortType.CHAPTER)
-        radioButton2 = MyRadioButton('按时间', SortType.TIME)
-        radioButton1.setChecked(True)
+        radioButtons = [MyRadioButton('按章节', SortType.CHAPTER),
+                        MyRadioButton('按时间', SortType.TIME)]
 
         layout = QVBoxLayout()
-        layout.addWidget(radioButton1)
-        layout.addWidget(radioButton2)
+
+        for button in radioButtons:
+            if button.value == self.exportSetting.sort_type:
+                button.setChecked(True)
+            layout.addWidget(button)
+
         annotationSortGroupBox.setLayout(layout)
 
         return annotationSortGroupBox
