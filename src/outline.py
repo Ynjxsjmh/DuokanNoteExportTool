@@ -1,3 +1,9 @@
+from pdfminer.pdfdocument import PDFDocument, PDFNoOutlines
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFParser
+from pdfminer.pdftypes import PDFObjRef, resolve1
+from pdfminer.psparser import PSLiteral
+
 from PyPDF2 import PdfFileReader
 
 
@@ -27,5 +33,63 @@ class PyPDF2Outline:
                     'page': pdf.getDestinationPageNumber(outline),
                     'level': level,
                 })
+
+        return results
+
+
+class PdfminerOutline:
+
+    @staticmethod
+    def getOutlines(path):
+        with open(path, 'rb') as f:
+            parser = PDFParser(f)
+            doc = PDFDocument(parser)
+            outlines = PdfminerOutline._processOutlines(doc)
+
+        return outlines
+
+    @staticmethod
+    def _processOutlines(doc):
+        def resolve_dest(dest):
+            if isinstance(dest, str):
+                dest = resolve1(doc.get_dest(dest))
+            elif isinstance(dest, PSLiteral):
+                dest = resolve1(doc.get_dest(dest.name))
+            if isinstance(dest, dict):
+                dest = dest['D']
+            if isinstance(dest, PDFObjRef):
+                dest = dest.resolve()
+            return dest
+
+        pages = {page.pageid: pageno for (pageno, page)
+                 in enumerate(PDFPage.create_pages(doc), 1)}
+
+        results = []
+
+        try:
+            outlines = doc.get_outlines()
+
+            for (level, title, dest, a, se) in outlines:
+                pageno = None
+                if dest:
+                    dest = resolve_dest(dest)
+                    pageno = pages[dest[0].objid]
+                elif a:
+                    action = a
+                    if isinstance(action, dict):
+                        subtype = action.get('S')
+                        if subtype and repr(subtype) == '/\'GoTo\'' and action.get(
+                                'D'):
+                            dest = resolve_dest(action['D'])
+                            pageno = pages[dest[0].objid]
+
+                results.append({
+                    'title': title,
+                    'page': pageno,
+                    'level': level,
+                })
+
+        except PDFNoOutlines:
+            pass
 
         return results
