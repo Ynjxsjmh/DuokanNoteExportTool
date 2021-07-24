@@ -186,13 +186,13 @@ class DuoKanExportToolDialog(QDialog):
         hboxLayout.addWidget(exportDirText)
         hboxLayout.addWidget(folderButton)
 
-        defaultPushButton = QPushButton('导出')
-        defaultPushButton.setDefault(True)
+        exportButton = QPushButton('导出')
+        exportButton.setDefault(True)
 
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(tableWidget)
         vboxLayout.addLayout(hboxLayout)
-        vboxLayout.addWidget(defaultPushButton, 0, Qt.AlignCenter)
+        vboxLayout.addWidget(exportButton, 0, Qt.AlignCenter)
 
         selectedBookListGroupBox.setLayout(vboxLayout)
 
