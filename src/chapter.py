@@ -10,7 +10,7 @@ class Chapter:
     '''用于从原文件或多看笔记中得到笔记所在章节
     '''
     def __init__(self):
-        raise NotImplementedError
+        self.outlines = []
 
     def getChapter(self, index):
         '''获取 chapter 字典
@@ -27,7 +27,22 @@ class Chapter:
         include: boolean
           是否包含当前 chapter
         '''
-        raise NotImplementedError
+        chapter = self.getChapter(index)
+        chapters = self.outlines
+
+        ancestor_chapters, level = [], chapter['level']
+
+        idx = [chapter['title'] for chapter in chapters].index(chapter['title'])
+
+        for cur_chapter in reversed(chapters[:idx]):
+            if cur_chapter['level'] == level - 1:
+                ancestor_chapters.append(cur_chapter)
+                level = level - 1
+
+        if include:
+            ancestor_chapters.append(chapter)
+
+        return reversed(ancestor_chapters)
 
     def getAncestorChapterNames(self, index, include=False):
         ancestor_chapters = self.getAncestorChapters(index, include)
@@ -64,24 +79,6 @@ class TXTChapter(Chapter):
     def getChapterName(self, annotation_sample):
         chapter = self.getChapter(annotation_sample)
         return chapter['title']
-
-    def getAncestorChapters(self, annotation_sample):
-        chapter = self.getChapter(annotation_sample)
-        chapters = self.outlines
-
-        ancestor_chapters, level = [], chapter['level']
-
-        idx = [chapter['title'] for chapter in chapters].index(chapter['title'])
-
-        for cur_chapter in reversed(chapters[:idx]):
-            if cur_chapter['level'] == level - 1:
-                ancestor_chapters.append(cur_chapter)
-                level = level - 1
-
-        if include:
-            ancestor_chapters.append(chapter)
-
-        return reversed(ancestor_chapters)
 
 
 class EPUBChapter(Chapter):
@@ -140,24 +137,6 @@ class EPUBChapter(Chapter):
         else:
             return chapter[0]
 
-    def getAncestorChapters(self, chapter_id, include=False):
-        chapter = self.getChapter(chapter_id)
-        chapters = self.outlines
-
-        ancestor_chapters, level = [], chapter['level']
-
-        idx = [chapter['id'] for chapter in chapters].index(chapter['id'])
-
-        for cur_chapter in reversed(chapters[:idx]):
-            if cur_chapter['level'] == level - 1:
-                ancestor_chapters.append(cur_chapter)
-                level = level - 1
-
-        if include:
-            ancestor_chapters.append(chapter)
-
-        return reversed(ancestor_chapters)
-
 
 class PDFChapter(Chapter):
     def __init__(self, path):
@@ -179,24 +158,6 @@ class PDFChapter(Chapter):
             chapter_index = len(self.outlines) - 1
 
         return self.outlines[chapter_index]
-
-    def getAncestorChapters(self, fixed_index, include=False):
-        chapter = self.getChapter(fixed_index)
-        chapters = self.outlines
-
-        ancestor_chapters, level = [], chapter['level']
-
-        idx = [chapter['title'] for chapter in chapters].index(chapter['title'])
-
-        for cur_chapter in reversed(chapters[:idx]):
-            if cur_chapter['level'] == level - 1:
-                ancestor_chapters.append(cur_chapter)
-                level = level - 1
-
-        if include:
-            ancestor_chapters.append(chapter)
-
-        return reversed(ancestor_chapters)
 
 
 class DuoKanChapter:
