@@ -60,6 +60,15 @@ class ExportBook():
     def author(self, author):
         self._author = author
 
+    def __str__(self):
+        return 'book_id: {}, file_path: {}, file_name: {}, use_duokan_notes: {}, author: {}'.format(
+            self._book_id,
+            self._file_path,
+            self._file_name,
+            self._use_duokan_notes,
+            self._author,
+        )
+
 
 class ExportSetting:
     def __init__(self):
