@@ -236,7 +236,7 @@ class DuoKanExportToolDialog(QDialog):
         rowId = tableWidget.rowCount()
         tableWidget.insertRow(rowId)
 
-        # 'BookID', 'ID', '编号', '书名', '作者', '文件路径', '文件类型', '操作'
+        # 'BookID', 'ID', '编号', '书名', '作者', '文件路径', '文件来源', '操作'
         # 'ID' 是行号，保证每行都唯一，用于删除行
         # '编号' 和 bookListTableWidget 的编号对应
         tableWidget.setItem(rowId, 0, QTableWidgetItem(str(bookId)))
@@ -244,6 +244,21 @@ class DuoKanExportToolDialog(QDialog):
         tableWidget.setItem(rowId, 2, QTableWidgetItem(str(id)))
         tableWidget.setItem(rowId, 3, QTableWidgetItem(bookName))
         tableWidget.setItem(rowId, 4, QTableWidgetItem(bookAuthor))
+
+        dirButton = QPushButton('选择')
+        dirButton.setDefault(True)
+        def selectDir():
+            path = QFileDialog.getOpenFileName(self, 'Select File')[0]
+            if path:
+                dirButton.setText(path.split('/')[-1])
+        dirButton.clicked.connect(selectDir)
+
+        tableWidget.setCellWidget(rowId, 5, dirButton)
+
+        typeComboBox = QComboBox()
+        typeComboBox.addItems(['无', '原书籍', '多看笔记'])
+
+        tableWidget.setCellWidget(rowId, 6, typeComboBox)
 
         delButton = QPushButton('删除')
         delButton.clicked.connect(
@@ -266,7 +281,7 @@ class DuoKanExportToolDialog(QDialog):
         tableWidget.setColumnHidden(1, True)
         tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         tableWidget.setHorizontalHeaderLabels([
-            'BookID', 'ID', '编号', '书名', '作者', '文件路径', '文件类型', '操作'
+            'BookID', 'ID', '编号', '书名', '作者', '文件路径', '文件来源', '操作'
         ])
 
         exportDirLabel = QLabel('导出路径：')
