@@ -19,7 +19,8 @@ class Chapter:
         raise NotImplementedError
 
     def getChapterName(self, index):
-        raise NotImplementedError
+        chapter = self.getChapter(index)
+        return chapter['title']
 
     def getAncestorChapters(self, index, include=False):
         '''获取当前 chapter 的所有父 chapter
@@ -76,10 +77,6 @@ class TXTChapter(Chapter):
 
         return chapter
 
-    def getChapterName(self, annotation_sample):
-        chapter = self.getChapter(annotation_sample)
-        return chapter['title']
-
 
 class EPUBChapter(Chapter):
     def __init__(self, path):
@@ -107,11 +104,6 @@ class EPUBChapter(Chapter):
                  for idref, linear in book.opf.spine.itemrefs]
 
         return spine
-
-    def getChapterName(self, chapter_id):
-        chapter = self.getChapter(chapter_id)
-
-        return chapter['title']
 
     def getChapter(self, chapter_id):
         '''
@@ -141,11 +133,6 @@ class EPUBChapter(Chapter):
 class PDFChapter(Chapter):
     def __init__(self, path):
         self.outlines = PdfminerOutline.getOutlines(path)
-
-    def getChapterName(self, fixed_index):
-        chapter = self.getChapter(fixed_index)
-
-        return chapter['title']
 
     def getChapter(self, fixed_index):
         chapter_index = 0
