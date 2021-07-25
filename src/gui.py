@@ -134,13 +134,13 @@ class DuoKanExportToolDialog(QDialog):
 
         topLayout = self.createTopLayout()
         self.bookListGroupBox = self.createBookListGroupBox()
-        selectedBookListGroupBox = self.createSelectedBookListGroupBox()
+        self.selectedBookListGroupBox = self.createSelectedBookListGroupBox()
         progressBar = self.createProgressBar()
 
         mainLayout = QGridLayout()
         mainLayout.addLayout(topLayout, 0, 0, 1, 2)
         mainLayout.addWidget(self.bookListGroupBox, 2, 0)
-        mainLayout.addWidget(selectedBookListGroupBox, 3, 0)
+        mainLayout.addWidget(self.selectedBookListGroupBox, 3, 0)
         mainLayout.addWidget(progressBar, 4, 0, 1, 2)
 
         self.setLayout(mainLayout)
@@ -230,14 +230,48 @@ class DuoKanExportToolDialog(QDialog):
 
         return bookListGroupBox
 
+    def addRowToSelectedBookListTableWidget(self, id, bookId, bookName, bookAuthor):
+        tableWidget = self.selectedBookListGroupBox.findChild(QTableWidget, 'selectedBookListTableWidget')
+
+        rowId = tableWidget.rowCount()
+        tableWidget.insertRow(rowId)
+
+        # 'BookID', 'ID', '编号', '书名', '作者', '文件路径', '文件类型', '操作'
+        # 'ID' 是行号，保证每行都唯一，用于删除行
+        # '编号' 和 bookListTableWidget 的编号对应
+        tableWidget.setItem(rowId, 0, QTableWidgetItem(str(bookId)))
+        tableWidget.setItem(rowId, 1, QTableWidgetItem(str(rowId + 1)))
+        tableWidget.setItem(rowId, 2, QTableWidgetItem(str(id)))
+        tableWidget.setItem(rowId, 3, QTableWidgetItem(bookName))
+        tableWidget.setItem(rowId, 4, QTableWidgetItem(bookAuthor))
+
+        delButton = QPushButton('删除')
+        delButton.clicked.connect(
+            lambda rowId=rowId: self.delRowFromSelectedBookListTableWidget(rowId))
+
+        hBox = QHBoxLayout()
+        hBox.addWidget(delButton, Qt.AlignCenter)
+        w = QWidget()
+        w.setLayout(hBox)
+
+        tableWidget.setCellWidget(rowId, 7, w)
+
+        return tableWidget
+
+    def delRowFromSelectedBookListTableWidget(self, rowId):
+        tableWidget = self.selectedBookListGroupBox.findChild(QTableWidget, 'selectedBookListTableWidget')
+        tableWidget.removeRow(rowId)
+
     def createSelectedBookListGroupBox(self):
         selectedBookListGroupBox = QGroupBox('已选书籍')
         selectedBookListGroupBox.setAlignment(Qt.AlignCenter)
 
-        tableWidget = QTableWidget(0, 5)
+        tableWidget = QTableWidget(0, 8, objectName='selectedBookListTableWidget')
+        tableWidget.setColumnHidden(0, True)
+        tableWidget.setColumnHidden(1, True)
         tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         tableWidget.setHorizontalHeaderLabels([
-            '编号', '书名', '作者', '划线数', '想法数'
+            'BookID', 'ID', '编号', '书名', '作者', '文件路径', '文件类型', '操作'
         ])
 
         exportDirLabel = QLabel('导出路径：')
