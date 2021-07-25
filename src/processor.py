@@ -35,7 +35,7 @@ def _get_chapter(package_type, file_path, use_duokan_notes):
     return chapter
 
 
-def _get_chapter_name(chapter, package_type, index, annotations, use_duokan_notes):
+def _get_chapter_name(chapter, package_type, index, annotations, file_path, use_duokan_notes):
     arg = index
 
     if package_type == 'EPUB':
@@ -49,6 +49,9 @@ def _get_chapter_name(chapter, package_type, index, annotations, use_duokan_note
         arg = annotations[0]
 
     chapter_name = chapter.getChapterName(arg)
+
+    if file_path != '' and use_duokan_notes == False:
+        chapter_name = chapter.getAncestorChapterNames(arg, True)
 
     return chapter_name
 
@@ -84,8 +87,8 @@ def get_annotations_in_book(exportBook, exportSetting):
         if exportBook.file_path:
             # If not specific file path, then use info in
             # annotations.annotation_range as chapter name
-            chapter_name = _get_chapter_name(chapter, package_type, index,
-                                             annotations, exportBook.use_duokan_notes)
+            chapter_name = _get_chapter_name(chapter, package_type, index, annotations,
+                                             exportBook.file_path, exportBook.use_duokan_notes)
         else:
             chapter_name = str(index)
 
@@ -117,7 +120,7 @@ def get_annotations_in_book(exportBook, exportSetting):
         while j < len(annotations_by_chapter_with_chapter_name):
             annotations_j = annotations_by_chapter_with_chapter_name[j]
 
-            if annotations_i[0][0] == annotations_j[0][0]:
+            if ''.join(annotations_i[0][0]) == ''.join(annotations_j[0][0]):
                 annotation_by_chapter_name += annotations_j
                 j = j + 1
             else:
@@ -127,10 +130,23 @@ def get_annotations_in_book(exportBook, exportSetting):
         i = j
 
     result = ''
-    for annotation_by_chapter_name in annotations_by_chapter_name:
-        result += '\n' + annotation_by_chapter_name[0][0] + '\n'
-        for chapter_name, annotation in annotation_by_chapter_name:
-            result += annotation
+
+    if exportBook.file_path != '' and exportBook.use_duokan_notes == False:
+        known_chapter_names = {}
+        for annotation_by_chapter_name in annotations_by_chapter_name:
+            chapter_names = annotation_by_chapter_name[0][0]
+            unknown_chapter_names = [chapter_name for chapter_name in chapter_names
+                                     if chapter_name not in known_chapter_names]
+            known_chapter_names.update(unknown_chapter_names)
+
+            result += '\n' + '\n'.join(unknown_chapter_names) + '\n'
+            for chapter_name, annotation in annotation_by_chapter_name:
+                result += annotation
+    else:
+        for annotation_by_chapter_name in annotations_by_chapter_name:
+            result += '\n' + annotation_by_chapter_name[0][0] + '\n'
+            for chapter_name, annotation in annotation_by_chapter_name:
+                result += annotation
 
     return result.strip()
 
