@@ -49,16 +49,20 @@ class TXTChapter(Chapter):
             encoding = result['encoding']
         return encoding
 
-    def getChapterName(self, annotation_sample):
-        chapter_name = ''
+    def getChapter(self, annotation_sample):
+        chapter = None
         start = self.content.find(annotation_sample)
 
         for outline in reversed(self.outlines):
             if start >= outline['start_byte_offset']:
-                chapter_name = outline['title']
+                chapter = outline
                 break
 
-        return chapter_name
+        return chapter
+
+    def getChapterName(self, annotation_sample):
+        chapter = self.getChapter(annotation_sample)
+        return chapter['title']
 
 
 class EPUBChapter(Chapter):
@@ -89,11 +93,11 @@ class EPUBChapter(Chapter):
         return spine
 
     def getChapterName(self, chapter_id):
-        chapter = self.getChapterById(chapter_id, self.itemrefs, self.items, self.outlines)
+        chapter = self.getChapter(chapter_id)
 
         return chapter['title']
 
-    def getChapterById(self, chapter_id, itemrefs, items, chapters):
+    def getChapter(self, chapter_id):
         '''
         itemref: idref (itemref is `itemref` label in content.opf)
         item: href, id (item is `item` label in content.opf)
@@ -102,9 +106,9 @@ class EPUBChapter(Chapter):
         itemref.idref = item.id
         item.href = chapter.src
         '''
-        itemref = [itemref for itemref in itemrefs if itemref['idref'] == chapter_id][0]
-        item = [item for item in items if item['id'] == itemref['idref']][0]
-        chapter = [chapter for chapter in chapters if chapter['src'] == item['href']]
+        itemref = [itemref for itemref in self.itemrefs if itemref['idref'] == chapter_id][0]
+        item = [item for item in self.items if item['id'] == itemref['idref']][0]
+        chapter = [chapter for chapter in self.outlines if chapter['src'] == item['href']]
 
         if len(chapter) == 0:
             '''
@@ -112,8 +116,8 @@ class EPUBChapter(Chapter):
             解决方案是找前一个 item 对应的 chapter。
             可能存在的问题是前一个 item 不存在。
             '''
-            previous_chapter_id = itemrefs[[itemref['idref'] for itemref in itemrefs].index(chapter_id) - 1]
-            return self.getChapterById(previous_chapter_id['idref'], itemrefs, items, chapters)
+            previous_chapter_id = self.itemrefs[[itemref['idref'] for itemref in self.itemrefs].index(chapter_id) - 1]
+            return self.getChapter(previous_chapter_id['idref'])
         else:
             return chapter[0]
 
@@ -135,11 +139,11 @@ class PDFChapter(Chapter):
         self.outlines = PdfminerOutline.getOutlines(path)
 
     def getChapterName(self, fixed_index):
-        chapter_index = self.getChapterIndex(fixed_index)
+        chapter = self.getChapter(fixed_index)
 
-        return self.outlines[chapter_index]['title']
+        return chapter['title']
 
-    def getChapterIndex(self, fixed_index):
+    def getChapter(self, fixed_index):
         chapter_index = 0
 
         try:
@@ -149,7 +153,7 @@ class PDFChapter(Chapter):
         except StopIteration:
             chapter_index = len(self.outlines) - 1
 
-        return chapter_index
+        return self.outlines[chapter_index]
 
 
 class DuoKanChapter:
