@@ -219,7 +219,7 @@ class DuoKanExportToolDialog(QDialog):
         tableWidget.setColumnHidden(0, True)
         tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         tableWidget.setHorizontalHeaderLabels([
-            'ID', '编号', '书名', '作者', '操作'
+            'BookID', '编号', '书名', '作者', '操作'
         ])
 
         hboxLayout = QHBoxLayout()
@@ -247,7 +247,7 @@ class DuoKanExportToolDialog(QDialog):
 
         delButton = QPushButton('删除')
         delButton.clicked.connect(
-            lambda rowId=rowId: self.delRowFromSelectedBookListTableWidget(rowId))
+            lambda checked, rowId=rowId: self.delRowFromSelectedBookListTableWidget(rowId))
 
         hBox = QHBoxLayout()
         hBox.addWidget(delButton, Qt.AlignCenter)
