@@ -1,6 +1,7 @@
 import datetime
 import itertools
 import json
+import os
 
 from chapter import Chapter, EPUBChapter, DuoKanChapter, PDFChapter, TXTChapter
 from connector import Connector
@@ -125,3 +126,16 @@ def get_annotations_in_book(exportBook, exportSetting):
             result += annotation
 
     return result.strip()
+
+
+def export_annotations_in_book(exportBook, exportSetting):
+    file_dir = exportSetting.export_dir
+    file_name = exportBook.file_name
+    file_path = os.path.join(file_dir, file_name + '.' + 'txt')
+
+    content = get_annotations_in_book(exportBook, exportSetting)
+
+    content = file_name + '\n' + exportBook.author + '\n\n' + content
+
+    with open(file_path, 'w') as f:
+        f.write(content)
