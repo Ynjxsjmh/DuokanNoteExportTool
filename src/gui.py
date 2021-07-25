@@ -12,6 +12,12 @@ class MyRadioButton(QRadioButton):
         self.value = value
 
 
+class MyPushButton(QPushButton):
+    def __init__(self, text, value=''):
+        super().__init__(text)
+        self.value = value
+
+
 class SettingDialog(QDialog):
     def __init__(self, exportSetting, parent=None):
         super().__init__(parent)
@@ -245,12 +251,13 @@ class DuoKanExportToolDialog(QDialog):
         tableWidget.setItem(rowId, 3, QTableWidgetItem(bookName))
         tableWidget.setItem(rowId, 4, QTableWidgetItem(bookAuthor))
 
-        dirButton = QPushButton('选择')
+        dirButton = MyPushButton('选择')
         dirButton.setDefault(True)
         def selectDir():
             path = QFileDialog.getOpenFileName(self, 'Select File')[0]
             if path:
                 dirButton.setText(path.split('/')[-1])
+                dirButton.value = path
         dirButton.clicked.connect(selectDir)
 
         tableWidget.setCellWidget(rowId, 5, dirButton)
