@@ -311,6 +311,7 @@ class DuoKanExportToolDialog(QDialog):
 
         exportButton = QPushButton('导出')
         exportButton.setDefault(True)
+        exportButton.clicked.connect(self.exportSelectedBooks)
 
         vboxLayout = QVBoxLayout()
         vboxLayout.addWidget(tableWidget)
