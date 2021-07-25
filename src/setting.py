@@ -16,6 +16,7 @@ class ExportBook():
     def __init__(self):
         self._book_id = None
         self._file_path = ''
+        self._file_name = ''
         self._use_duokan_notes = False
 
     @property
@@ -42,6 +43,14 @@ class ExportBook():
     def file_path(self, file_path):
         self._file_path = file_path
 
+    @property
+    def file_name(self):
+        return self._file_name
+
+    @file_name.setter
+    def file_name(self, file_name):
+        self._file_name = file_name
+
 
 class ExportSetting:
     def __init__(self):
@@ -50,7 +59,6 @@ class ExportSetting:
         self._sort_type = SortType.CHAPTER
         self._outline_type = OutlineType.ORIGIN
         self._export_dir = ''
-        self.export_books = []
 
     @property
     def db_path(self):
