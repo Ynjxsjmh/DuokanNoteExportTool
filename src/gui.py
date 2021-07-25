@@ -2,6 +2,7 @@ from PyQt5.QtCore import QDateTime, Qt, QTimer
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 
+from connector import Connector
 from setting import SortType, OutlineType, ExportSetting
 
 
@@ -132,13 +133,13 @@ class DuoKanExportToolDialog(QDialog):
         self.exportSetting = ExportSetting()
 
         topLayout = self.createTopLayout()
-        bookListGroupBox = self.createBookListGroupBox()
+        self.bookListGroupBox = self.createBookListGroupBox()
         selectedBookListGroupBox = self.createSelectedBookListGroupBox()
         progressBar = self.createProgressBar()
 
         mainLayout = QGridLayout()
         mainLayout.addLayout(topLayout, 0, 0, 1, 2)
-        mainLayout.addWidget(bookListGroupBox, 2, 0)
+        mainLayout.addWidget(self.bookListGroupBox, 2, 0)
         mainLayout.addWidget(selectedBookListGroupBox, 3, 0)
         mainLayout.addWidget(progressBar, 4, 0, 1, 2)
 
@@ -153,6 +154,9 @@ class DuoKanExportToolDialog(QDialog):
             path = QFileDialog.getOpenFileName(self, 'Open', filter='db(*.db)')[0]
             if path:
                 self.exportSetting.db_path = path
+                connector = Connector(path)
+                bookList = connector.find_all_books()
+                self.initBookListTableWidget(bookList)
         openFileButton.clicked.connect(openFile)
 
         settingButton = QPushButton('设置')
@@ -180,14 +184,42 @@ class DuoKanExportToolDialog(QDialog):
 
         return topLayout
 
+    def initBookListTableWidget(self, bookList):
+        tableWidget = self.bookListGroupBox.findChild(QTableWidget, 'bookListTableWidget')
+
+        for (bookId, bookName, bookAuthor) in bookList:
+            rowId = tableWidget.rowCount()
+            tableWidget.insertRow(rowId)
+
+            tableWidget.setItem(rowId, 0, QTableWidgetItem(str(bookId)))
+            tableWidget.setItem(rowId, 1, QTableWidgetItem(str(rowId + 1)))
+            tableWidget.setItem(rowId, 2, QTableWidgetItem(bookName))
+            tableWidget.setItem(rowId, 3, QTableWidgetItem(bookAuthor))
+
+            addButton = QPushButton('添加')
+            def addToSelected():
+                (rowId+1, bookId, bookName, bookAuthor)
+            addButton.clicked.connect(addToSelected)
+
+            hBox = QHBoxLayout()
+            hBox.addWidget(addButton, Qt.AlignCenter)
+            w = QWidget()
+            w.setLayout(hBox)
+
+            tableWidget.setCellWidget(rowId, 4, w)
+
+        return tableWidget
+
     def createBookListGroupBox(self):
         bookListGroupBox = QGroupBox('书籍列表')
         bookListGroupBox.setAlignment(Qt.AlignCenter)
 
-        tableWidget = QTableWidget(5, 5)
+        tableWidget = QTableWidget(0, 5, objectName='bookListTableWidget')
+
+        tableWidget.setColumnHidden(0, True)
         tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
         tableWidget.setHorizontalHeaderLabels([
-            '编号', '书名', '作者', '划线数', '想法数'
+            'ID', '编号', '书名', '作者', '操作'
         ])
 
         hboxLayout = QHBoxLayout()
