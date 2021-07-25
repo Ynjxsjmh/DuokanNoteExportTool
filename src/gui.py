@@ -249,18 +249,13 @@ class DuoKanExportToolDialog(QDialog):
         delButton.clicked.connect(
             lambda checked, rowId=rowId: self.delRowFromSelectedBookListTableWidget(rowId))
 
-        hBox = QHBoxLayout()
-        hBox.addWidget(delButton, Qt.AlignCenter)
-        w = QWidget()
-        w.setLayout(hBox)
-
-        tableWidget.setCellWidget(rowId, 7, w)
+        tableWidget.setCellWidget(rowId, 7, delButton)
 
         return tableWidget
 
     def delRowFromSelectedBookListTableWidget(self, rowId):
         tableWidget = self.selectedBookListGroupBox.findChild(QTableWidget, 'selectedBookListTableWidget')
-        tableWidget.removeRow(rowId)
+        tableWidget.removeRow(tableWidget.currentRow())
 
     def createSelectedBookListGroupBox(self):
         selectedBookListGroupBox = QGroupBox('已选书籍')
