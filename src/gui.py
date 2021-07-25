@@ -197,9 +197,9 @@ class DuoKanExportToolDialog(QDialog):
             tableWidget.setItem(rowId, 3, QTableWidgetItem(bookAuthor))
 
             addButton = QPushButton('添加')
-            def addToSelected():
-                (rowId+1, bookId, bookName, bookAuthor)
-            addButton.clicked.connect(addToSelected)
+            addButton.clicked.connect(
+                lambda id=rowId+1, bookId=bookId, bookName=bookName, bookAuthor=bookAuthor:\
+                self.addRowToSelectedBookListTableWidget(id, bookId, bookName, bookAuthor))
 
             hBox = QHBoxLayout()
             hBox.addWidget(addButton, Qt.AlignCenter)
