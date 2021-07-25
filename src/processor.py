@@ -9,7 +9,7 @@ from setting import SortType, OutlineType, ExportBook, ExportSetting
 
 
 def _get_chapter(package_type, file_path, use_duokan_notes):
-    '''
+    '''根据文件类型创建相应 chapter 对象
     package_type: str
       File type
     file_path: str
@@ -70,8 +70,13 @@ def get_annotations_in_book(exportBook, exportSetting):
     chapter = _get_chapter(package_type, exportBook.file_path, exportBook.use_duokan_notes)
 
     annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
+    #     chapter       chapter
+    # [[annotation], [annotation], ...]
     annotations_by_chapter = itertools.groupby(annotations, key=lambda annotation: json.loads(annotation[1])[0][index_key])
 
+    # chapter_name1 and chapter_name2 may be the same in PDF case
+    # PDF case is groupby fixed_index which is the annotation page not chapter page
+    # [[(chapter_name1, annotation_with_time)], [(chapter_name2, annotation_with_time)], ...]
     annotations_by_chapter_with_chapter_name = []
     for index, annotations in annotations_by_chapter:
         annotations = list(annotations)
@@ -99,6 +104,8 @@ def get_annotations_in_book(exportBook, exportSetting):
 
         annotations_by_chapter_with_chapter_name.append(annotation_by_chapter_with_chapter_name)
 
+    # Merge same chapter name in different list
+    # [[(chapter_name, annotation_with_time)], [(chapter_name, annotation_with_time)], ...]
     annotations_by_chapter_name = []
     i = 0
     while i < len(annotations_by_chapter_with_chapter_name):

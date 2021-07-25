@@ -7,6 +7,8 @@ from outline import PyPDF2Outline, PdfminerOutline,\
 
 
 class Chapter:
+    '''用于从原文件或多看笔记中得到笔记所在章节
+    '''
     def __init__(self):
         raise NotImplementedError
 
