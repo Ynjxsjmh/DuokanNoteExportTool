@@ -12,7 +12,24 @@ class Chapter:
     def __init__(self):
         raise NotImplementedError
 
+    def getChapter(self, index):
+        '''获取 chapter 字典
+        一般来说 chapter 字典有 title, page, level 这三个键
+        '''
+        raise NotImplementedError
+
     def getChapterName(self, index):
+        raise NotImplementedError
+
+    def getAncestorChapters(self, index, include):
+        '''获取当前 chapter 的所有父 chapter
+        一般来说 chapter 字典有 title, page, level 这三个键
+        include: boolean
+          是否包含当前 chapter
+        '''
+        raise NotImplementedError
+
+    def getAncestorChapterNames(self, index, include):
         raise NotImplementedError
 
 
