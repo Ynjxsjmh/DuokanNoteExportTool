@@ -3,7 +3,8 @@ from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
 
 from connector import Connector
-from setting import SortType, OutlineType, ExportSetting
+from processor import export_annotations_in_book
+from setting import SortType, OutlineType, ExportBook, ExportSetting
 
 
 class MyRadioButton(QRadioButton):
@@ -319,6 +320,24 @@ class DuoKanExportToolDialog(QDialog):
         selectedBookListGroupBox.setLayout(vboxLayout)
 
         return selectedBookListGroupBox
+
+    def exportSelectedBooks(self):
+        tableWidget = self.selectedBookListGroupBox.findChild(QTableWidget,
+                                                                  'selectedBookListTableWidget')
+        if not self.exportSetting.db_path:
+            return
+
+        for row in range(tableWidget.rowCount()):
+            exportBook = ExportBook()
+            exportBook.book_id = tableWidget.item(row, 0).text()
+            exportBook.file_name = tableWidget.item(row, 3).text()
+            exportBook.author = tableWidget.item(row, 4).text()
+            exportBook.file_path = tableWidget.cellWidget(row, 5).value
+            if tableWidget.itemAt(row, 6).text() == '多看笔记':
+                exportBook.use_duokan_notes = True
+
+            print(exportBook)
+            export_annotations_in_book(exportBook, self.exportSetting)
 
     def createProgressBar(self):
         progressBar = QProgressBar()
