@@ -4,6 +4,7 @@ import json
 
 from chapter import Chapter, EPUBChapter, DuoKanChapter, PDFChapter, TXTChapter
 from connector import Connector
+from setting import SortType, OutlineType, ExportBook, ExportSetting
 
 
 def _get_chapter(package_type, file_path, use_duokan_notes):
@@ -51,10 +52,10 @@ def _get_chapter_name(chapter, package_type, index, annotations, use_duokan_note
     return chapter_name
 
 
-def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, time_format='%Y-%m-%d %H:%M:%S'):
-    connector = Connector()
+def get_annotations_in_book(exportBook, exportSetting):
+    connector = Connector(exportSetting.db_path)
 
-    annotations = connector.find_annotations_in_book(book_id)
+    annotations = connector.find_annotations_in_book(exportBook.book_id)
     package_type = annotations[0][4]
 
     index_key = ''
@@ -65,7 +66,7 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
     elif package_type == 'EPUB':
         index_key = 'chapter_index'
 
-    chapter = _get_chapter(package_type, file_path, use_duokan_notes)
+    chapter = _get_chapter(package_type, exportBook.file_path, exportBook.use_duokan_notes)
 
     annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
     annotations_by_chapter = itertools.groupby(annotations, key=lambda annotation: json.loads(annotation[1])[0][index_key])
@@ -74,17 +75,17 @@ def export_annotations_in_books(book_id, file_path='', use_duokan_notes=False, t
     for index, annotations in annotations_by_chapter:
         annotations = list(annotations)
 
-        if file_path:
+        if exportBook.file_path:
             # If not specific file path, then use info in
             # annotations.annotation_range as chapter name
             chapter_name = _get_chapter_name(chapter, package_type, index,
-                                             annotations, use_duokan_notes)
+                                             annotations, exportBook.use_duokan_notes)
         else:
             chapter_name = str(index)
 
         annotation_by_chapter_with_chapter_name = []
         for annotation in annotations:
-            added_time = datetime.datetime.utcfromtimestamp(annotation[0]/1000).strftime(time_format)
+            added_time = datetime.datetime.utcfromtimestamp(annotation[0]/1000).strftime(exportSetting.time_format)
             note_text = json.loads(annotation[2])['note_text']
             annotation_sample = annotation[3]
 
