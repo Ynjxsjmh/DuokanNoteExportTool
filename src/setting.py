@@ -18,6 +18,7 @@ class ExportBook():
         self._file_path = ''
         self._file_name = ''
         self._use_duokan_notes = False
+        self._author = ''
 
     @property
     def book_id(self):
@@ -50,6 +51,14 @@ class ExportBook():
     @file_name.setter
     def file_name(self, file_name):
         self._file_name = file_name
+
+    @property
+    def author(self):
+        return self._author
+
+    @author.setter
+    def author(self, author):
+        self._author = author
 
 
 class ExportSetting:
