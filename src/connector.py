@@ -45,7 +45,7 @@ class Connector:
         cur = self.con.cursor()
 
         sql = '''
-        SELECT _id, book_name, author
+        SELECT _id, book_name, author, book_uri
         FROM books;
         '''
 

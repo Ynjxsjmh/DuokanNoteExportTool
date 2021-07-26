@@ -1,5 +1,6 @@
 import os
 import pickle
+import urllib
 
 from PyQt5.QtCore import QDateTime, Qt, QTimer
 from PyQt5.QtGui import QKeySequence
@@ -220,7 +221,7 @@ class DuoKanExportToolDialog(QDialog):
         if tableWidget is None:
             tableWidget = self.bookListGroupBox.findChild(QTableWidget, 'bookListTableWidget')
 
-        for (bookId, bookName, bookAuthor) in bookList:
+        for (bookId, bookName, bookAuthor, bookUri) in bookList:
             rowId = tableWidget.rowCount()
             tableWidget.insertRow(rowId)
 
@@ -231,8 +232,8 @@ class DuoKanExportToolDialog(QDialog):
 
             addButton = QPushButton('添加')
             addButton.clicked.connect(
-                lambda checked, id=rowId+1, bookId=bookId, bookName=bookName, bookAuthor=bookAuthor:\
-                self.addRowToSelectedBookListTableWidget(id, bookId, bookName, bookAuthor))
+                lambda checked, id=rowId+1, bookId=bookId, bookName=bookName, bookAuthor=bookAuthor, bookUri=bookUri:\
+                self.addRowToSelectedBookListTableWidget(id, bookId, bookName, bookAuthor, bookUri))
 
             hBox = QHBoxLayout()
             hBox.addWidget(addButton, Qt.AlignCenter)
@@ -265,7 +266,7 @@ class DuoKanExportToolDialog(QDialog):
 
         return bookListGroupBox
 
-    def addRowToSelectedBookListTableWidget(self, id, bookId, bookName, bookAuthor):
+    def addRowToSelectedBookListTableWidget(self, id, bookId, bookName, bookAuthor, bookUri):
         tableWidget = self.selectedBookListGroupBox.findChild(QTableWidget, 'selectedBookListTableWidget')
 
         rowId = tableWidget.rowCount()
@@ -277,7 +278,9 @@ class DuoKanExportToolDialog(QDialog):
         tableWidget.setItem(rowId, 0, QTableWidgetItem(str(bookId)))
         tableWidget.setItem(rowId, 1, QTableWidgetItem(str(rowId + 1)))
         tableWidget.setItem(rowId, 2, QTableWidgetItem(str(id)))
-        tableWidget.setItem(rowId, 3, QTableWidgetItem(bookName))
+        item = QTableWidgetItem(bookName)
+        item.setToolTip(urllib.parse.unquote(bookUri))
+        tableWidget.setItem(rowId, 3, item)
         tableWidget.setItem(rowId, 4, QTableWidgetItem(bookAuthor))
 
         dirButton = MyPushButton('选择')
