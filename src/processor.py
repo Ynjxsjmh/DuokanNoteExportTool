@@ -5,10 +5,11 @@ import os
 
 from chapter import Chapter, EPUBChapter, DuoKanChapter, PDFChapter, TXTChapter
 from connector import Connector
+from formatter import ChapterFormatter
 from setting import SortType, OutlineType, ExportBook, ExportSetting
 
 
-def _get_chapter(package_type, file_path, use_duokan_notes):
+def _get_chapter(package_type, file_path, use_duokan_notes, outline_type):
     '''根据文件类型创建相应 chapter 对象
     package_type: str
       File type
@@ -31,6 +32,16 @@ def _get_chapter(package_type, file_path, use_duokan_notes):
         chapter = PDFChapter(file_path)
     elif package_type == 'TXT':
         chapter = TXTChapter(file_path)
+
+    prefix = ''
+    if outline_type == OutlineType.ORIGIN:
+        pass
+    elif outline_type == OutlineType.MD:
+        prefix = '#'
+    elif outline_type == OutlineType.ORG:
+        prefix = '*'
+
+    chapter = ChapterFormatter(prefix, chapter)
 
     return chapter
 
@@ -70,7 +81,8 @@ def get_annotations_in_book(exportBook, exportSetting):
     elif package_type == 'EPUB':
         index_key = 'chapter_index'
 
-    chapter = _get_chapter(package_type, exportBook.file_path, exportBook.use_duokan_notes)
+    chapter = _get_chapter(package_type, exportBook.file_path, exportBook.use_duokan_notes,
+                           exportSetting.outline_type)
 
     annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
     #     chapter       chapter
