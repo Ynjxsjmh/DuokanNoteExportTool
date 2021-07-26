@@ -338,7 +338,6 @@ class DuoKanExportToolDialog(QDialog):
             if tableWidget.itemAt(row, 6).text() == '多看笔记':
                 exportBook.use_duokan_notes = True
 
-            print(exportBook)
             export_annotations_in_book(exportBook, self.exportSetting)
 
     def createProgressBar(self):
