@@ -84,7 +84,10 @@ def get_annotations_in_book(exportBook, exportSetting):
     chapter = _get_chapter(package_type, exportBook.file_path, exportBook.use_duokan_notes,
                            exportSetting.outline_type)
 
-    annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
+    if exportSetting.sort_type == SortType.CHAPTER:
+        annotations.sort(key=lambda annotation: json.loads(annotation[1])[0][index_key])
+    elif exportSetting.sort_type == SortType.TIME:
+        annotations.sort(key=lambda annotation: int(annotation[0]))
     #     chapter       chapter
     # [[annotation], [annotation], ...]
     annotations_by_chapter = itertools.groupby(annotations, key=lambda annotation: json.loads(annotation[1])[0][index_key])
