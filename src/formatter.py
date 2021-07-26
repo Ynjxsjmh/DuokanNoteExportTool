@@ -14,9 +14,9 @@ class ChapterFormatter(Chapter):
         return chapter['level'] * self.prefix + ' ' + chapter['title']
 
     def getAncestorChapters(self, index, include=False):
-        return self.chapter.getAncestorChapterNames(index, include)
+        return self.chapter.getAncestorChapters(index, include)
 
     def getAncestorChapterNames(self, index, include=False):
-        chapter_names = [self.getChapterName(index)
+        chapter_names = [(chapter['level'] * self.prefix + ' ' + chapter['title'])
                          for chapter in self.getAncestorChapters(index, include)]
         return chapter_names
