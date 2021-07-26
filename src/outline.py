@@ -17,7 +17,7 @@ class EPUBOutline:
         return outlines
 
     @staticmethod
-    def _processOutlines(navPoints, level=0):
+    def _processOutlines(navPoints, level=1):
         outlines = []
 
         for navPoint in navPoints:
@@ -47,7 +47,7 @@ class PyPDF2Outline:
         return outlines
 
     @staticmethod
-    def _processOutlines(pdf, outlines, level=0):
+    def _processOutlines(pdf, outlines, level=1):
         results = []
 
         for outline in outlines:
