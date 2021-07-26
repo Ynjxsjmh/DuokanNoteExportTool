@@ -228,6 +228,7 @@ class DuoKanExportToolDialog(QDialog):
         tableWidget.setHorizontalHeaderLabels([
             'BookID', '编号', '书名', '作者', '操作'
         ])
+        tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         hboxLayout = QHBoxLayout()
         hboxLayout.setContentsMargins(5, 5, 5, 5)
