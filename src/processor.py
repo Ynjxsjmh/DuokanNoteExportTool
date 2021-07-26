@@ -132,14 +132,14 @@ def get_annotations_in_book(exportBook, exportSetting):
     result = ''
 
     if exportBook.file_path != '' and exportBook.use_duokan_notes == False:
-        known_chapter_names = {}
+        known_chapter_names = set()
         for annotation_by_chapter_name in annotations_by_chapter_name:
             chapter_names = annotation_by_chapter_name[0][0]
             unknown_chapter_names = [chapter_name for chapter_name in chapter_names
                                      if chapter_name not in known_chapter_names]
             known_chapter_names.update(unknown_chapter_names)
 
-            result += '\n' + '\n'.join(unknown_chapter_names) + '\n'
+            result += '\n' + '\n'.join(reversed(unknown_chapter_names)) + '\n'
             for chapter_name, annotation in annotation_by_chapter_name:
                 result += annotation
     else:
