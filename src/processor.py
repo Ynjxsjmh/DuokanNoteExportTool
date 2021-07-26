@@ -166,7 +166,16 @@ def get_annotations_in_book(exportBook, exportSetting):
 def export_annotations_in_book(exportBook, exportSetting):
     file_dir = exportSetting.export_dir
     file_name = exportBook.file_name
-    file_path = os.path.join(file_dir, file_name + '.' + 'txt')
+
+    file_extension = '.txt'
+    if exportSetting.outline_type == OutlineType.ORIGIN:
+        pass
+    elif exportSetting.outline_type == OutlineType.MD:
+        file_extension = '.md'
+    elif exportSetting.outline_type == OutlineType.ORG:
+        file_extension = '.org'
+
+    file_path = os.path.join(file_dir, file_name + file_extension)
 
     content = get_annotations_in_book(exportBook, exportSetting)
 
