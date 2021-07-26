@@ -135,6 +135,12 @@ class TXTOutline:
     @staticmethod
     def _guessOutlines(path, encoding, content):
         chapters = []
+        count = {
+            '卷': 0,
+            '章': 0,
+            '节': 0,
+            '篇': 0,
+        }
 
         with open(path, 'r', encoding=encoding) as f:
             while True:
@@ -143,12 +149,21 @@ class TXTOutline:
                 # readline() returns an empty string when EOF is encountered
                 if not line: break
 
-                if re.match(r'(^第.+[卷|章|节|篇].*)', line):
-                    start = content.find(line)
-                    chapters.append({
-                        'title': line.strip(),
-                        'start_byte_offset': start,
-                        'end_byte_offset': start + len(line),
-                    })
+                for key in count.keys():
+                    if re.match(f'(^第.+[{key}].*)', line):
+                        start = content.find(line)
+                        chapters.append({
+                            'title': line.strip(),
+                            'start_byte_offset': start,
+                            'end_byte_offset': start + len(line),
+                            'type': key,
+                        })
+                        count[key] += 1
+                        break
+
+        count = {k: v for k, v in count.items() if v}
+        level = {item[0]: (i+1) for i, item in enumerate(sorted(count.items(), key=lambda item: item[1]))}
+        for chapter in chapters:
+            chapter['level'] = level[chapter['type']]
 
         return chapters
