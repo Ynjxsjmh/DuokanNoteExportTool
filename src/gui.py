@@ -1,3 +1,6 @@
+import os
+import pickle
+
 from PyQt5.QtCore import QDateTime, Qt, QTimer
 from PyQt5.QtGui import QKeySequence
 from PyQt5.QtWidgets import *
@@ -137,7 +140,9 @@ class DuoKanExportToolDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.exportSetting = ExportSetting()
+        curDir = os.path.dirname(os.path.abspath(__file__))
+        self.settingPath = os.path.join(curDir, 'setting.pickle')
+        self.exportSetting = self.loadExportSetting()
 
         topLayout = self.createTopLayout()
         self.bookListGroupBox = self.createBookListGroupBox()
@@ -153,6 +158,21 @@ class DuoKanExportToolDialog(QDialog):
         self.setLayout(mainLayout)
         self.setWindowTitle('多看导出助手')
 
+    def saveExportSetting(self):
+        with open(self.settingPath, 'wb') as f:
+            pickle.dump(self.exportSetting, f)
+
+    def loadExportSetting(self):
+        exportSetting = None
+
+        if os.path.exists(self.settingPath):
+            with open(self.settingPath, 'rb') as f:
+                exportSetting = pickle.load(f)
+        else:
+            exportSetting = ExportSetting()
+
+        return exportSetting
+
     def createTopLayout(self):
 
         openFileButton = QPushButton('打开')
@@ -161,9 +181,8 @@ class DuoKanExportToolDialog(QDialog):
             path = QFileDialog.getOpenFileName(self, 'Open', filter='db(*.db)')[0]
             if path:
                 self.exportSetting.db_path = path
-                connector = Connector(path)
-                bookList = connector.find_all_books()
-                self.initBookListTableWidget(bookList)
+                self.initBookListTableWidget()
+                self.saveExportSetting()
         openFileButton.clicked.connect(openFile)
 
         settingButton = QPushButton('设置')
@@ -191,8 +210,15 @@ class DuoKanExportToolDialog(QDialog):
 
         return topLayout
 
-    def initBookListTableWidget(self, bookList):
-        tableWidget = self.bookListGroupBox.findChild(QTableWidget, 'bookListTableWidget')
+    def initBookListTableWidget(self, tableWidget=None):
+        if not os.path.exists(self.exportSetting.db_path):
+            return
+
+        connector = Connector(self.exportSetting.db_path)
+        bookList = connector.find_all_books()
+
+        if tableWidget is None:
+            tableWidget = self.bookListGroupBox.findChild(QTableWidget, 'bookListTableWidget')
 
         for (bookId, bookName, bookAuthor) in bookList:
             rowId = tableWidget.rowCount()
@@ -229,6 +255,7 @@ class DuoKanExportToolDialog(QDialog):
             'BookID', '编号', '书名', '作者', '操作'
         ])
         tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.initBookListTableWidget(tableWidget)
 
         hboxLayout = QHBoxLayout()
         hboxLayout.setContentsMargins(5, 5, 5, 5)
@@ -294,7 +321,7 @@ class DuoKanExportToolDialog(QDialog):
         ])
 
         exportDirLabel = QLabel('导出路径：')
-        exportDirText = QLineEdit()
+        exportDirText = QLineEdit(self.exportSetting.export_dir)
 
         folderButton = QPushButton('选择')
         folderButton.setDefault(True)
@@ -303,6 +330,7 @@ class DuoKanExportToolDialog(QDialog):
             if path:
                 exportDirText.setText(path)
                 self.exportSetting.export_dir = path
+                self.saveExportSetting()
         folderButton.clicked.connect(selectFolder)
 
         hboxLayout = QHBoxLayout()
