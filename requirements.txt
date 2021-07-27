@@ -1,0 +1,5 @@
+cchardet==2.1.7
+epub==0.5.2
+pdfminer.six==20201018
+PyPDF2==1.26.0
+PyQt5==5.15.4
