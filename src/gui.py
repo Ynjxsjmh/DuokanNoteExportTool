@@ -323,6 +323,7 @@ class DuoKanExportToolDialog(QDialog):
         tableWidget.setHorizontalHeaderLabels([
             'BookID', 'ID', '编号', '书名', '作者', '文件路径', '文件来源', '操作'
         ])
+        tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         exportDirLabel = QLabel('导出路径：')
         exportDirText = QLineEdit(self.exportSetting.export_dir)
