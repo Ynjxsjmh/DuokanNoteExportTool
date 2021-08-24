@@ -236,12 +236,7 @@ class DuoKanExportToolDialog(QDialog):
                 lambda checked, id=rowId+1, bookId=bookId, bookName=bookName, bookAuthor=bookAuthor, bookUri=bookUri:\
                 self.addRowToSelectedBookListTableWidget(id, bookId, bookName, bookAuthor, bookUri))
 
-            hBox = QHBoxLayout()
-            hBox.addWidget(addButton, Qt.AlignCenter)
-            w = QWidget()
-            w.setLayout(hBox)
-
-            tableWidget.setCellWidget(rowId, 4, w)
+            tableWidget.setCellWidget(rowId, 4, addButton)
 
         return tableWidget
 
