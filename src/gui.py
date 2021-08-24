@@ -222,6 +222,8 @@ class DuoKanExportToolDialog(QDialog):
         if tableWidget is None:
             tableWidget = self.bookListGroupBox.findChild(QTableWidget, 'bookListTableWidget')
 
+        tableWidget.setRowCount(0)
+
         for (bookId, bookName, bookAuthor, bookUri) in bookList:
             rowId = tableWidget.rowCount()
             tableWidget.insertRow(rowId)
