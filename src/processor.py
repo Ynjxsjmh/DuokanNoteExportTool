@@ -71,6 +71,10 @@ def get_annotations_in_book(exportBook, exportSetting):
     connector = Connector(exportSetting.db_path)
 
     annotations = connector.find_annotations_in_book(exportBook.book_id)
+
+    if len(annotations) <= 0:
+        return ''
+
     package_type = annotations[0][4]
 
     index_key = ''
