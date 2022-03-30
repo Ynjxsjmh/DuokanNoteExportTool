@@ -177,7 +177,7 @@ class DuoKanExportToolDialog(QDialog):
 
     def createTopLayout(self):
 
-        openFileButton = QPushButton('打开')
+        openFileButton = QPushButton('选择数据库')
         openFileButton.setDefault(True)
         def openFile():
             path = QFileDialog.getOpenFileName(self, 'Open', filter='db(*.db)')[0]
