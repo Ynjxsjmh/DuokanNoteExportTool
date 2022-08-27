@@ -1,0 +1,93 @@
+#+AUTHOR: Ynjxsjmh
+#+CREATOR: Winy
+#+DATE: <2021-07-22 Thu>
+#+EMAIL: ynjxsjmh@gmail.com
+#+TITLE: 
+#+OPTIONS: title:t date:t author:t email:nil timestamp:t creator:nil ;; Meta
+#+OPTIONS: toc:t num:t H:5                         ;; TOC
+#+OPTIONS: ':nil *:t |:t -:t ::t <:t \n:nil ^:{}   ;; Syntax
+#+OPTIONS: broken-links:nil inline:t
+#+OPTIONS: todo:t p:nil pri:nil stat:t tasks:t     ;; TODO
+#+OPTIONS: c:nil d:(not "LOGBOOK") prop:nil        ;; Drawer
+#+OPTIONS: arch:headline tags:t tex:t f:t e:t
+#+FILETAGS: ::
+
+* 使用说明
+
+需要将手机存储里的 =/storage/emulated/0/DuoKan/Bookshelf.db= 复制一份到电脑上，接着终端运行 =python gui.py= 即可。
+
+* 特点
+
+1. 时间更加精确
+2. 章节和想法支持 Markdown 和 Org mode 的标题形式
+3. 选择图书进行导出
+
+* 导出样式
+** 多看默认的导出样式
+
+#+begin_quote
+书名
+
+作者
+
+ 章节名 \\
+ 想法日期 \\
+划线语句 \\
+注：想法（如果有） \\
+ 想法日期 \\
+划线语句 \\
+注：想法（如果有） \\
+
+ 章节名 \\
+ 想法日期 \\
+划线语句 \\
+注：想法（如果有） \\
+ 想法日期 \\
+划线语句 \\
+注：想法（如果有） \\
+#+end_quote
+
+样例：
+
+#+begin_quote
+爱你就像爱生命
+
+王小波
+
+ 代序 爱情十问 \\
+ 2021-07-14 \\
+有人说，爱情从来都是单方面的。在激情之爱发生时，大都是一方先爱上了另一方。接下去，有的爱得到了回应；有的爱没有得到回应。我们的情况属于前一种：我回应了他热烈的爱情，而对他的爱也变得炽烈。 \\
+ 最初的呼唤 \\
+ 2021-07-14 \\
+今天我想，我应该爱别人，不然我就毁了。 \\
+ 2021-07-14 \\
+祝你今天愉快。你明天的愉快留着我明天再祝。 \\
+ 2021-07-15 \\
+你好哇李银河。你可真有两下子，居然就不回来了。要是你去威尼斯，恐怕就永辈子见不到你了。 \\
+注: 感受到王小波那盼星星盼月亮的思念了。 \\
+#+end_quote
+
+** 本项目的导出样式
+
+#+begin_quote
+书名
+
+作者
+
+ 章节名 \\
+ 想法时间 \\
+划线语句 \\
+注：想法（如果有） \\
+ 想法时间 \\
+划线语句 \\
+注：想法（如果有） \\
+
+ 章节名 \\
+ 想法时间 \\
+划线语句 \\
+注：想法（如果有） \\
+ 想法时间 \\
+划线语句 \\
+注：想法（如果有） \\
+#+end_quote
+
